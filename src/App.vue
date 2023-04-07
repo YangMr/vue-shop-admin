@@ -11,8 +11,18 @@ export default defineComponent({
   name: 'App',
   components: {
     HelloWorld
+  },
+  created() {},
+  methods: {
+    test() {
+      var a = 10
+      console.log(a)
+    }
   }
 })
+
+// 代码检测工具  --  规则
+//
 </script>
 
 <style lang="scss">
