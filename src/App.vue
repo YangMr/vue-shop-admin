@@ -12,7 +12,6 @@ export default defineComponent({
   components: {
     HelloWorld
   },
-  created() {},
   methods: {
     test() {
       var a = 10
