@@ -28,3 +28,9 @@ git remote add origin git@github.com:YangMr/vue-shop-admin.git
 git push origin main
 ```
 
+
+
+## 四、代码规范
+
+参考`doc/一、代码规范文档`
+
