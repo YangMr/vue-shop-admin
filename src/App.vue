@@ -2,6 +2,7 @@
   <img alt="Vue logo" src="./assets/logo.png" />
   <p>hello</p>
   <p>123</p>
+  <p>789</p>
   <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
 </template>
 
