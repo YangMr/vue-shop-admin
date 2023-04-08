@@ -308,3 +308,688 @@ npx husky add .husky/commit-msg "npx --no-install commitlint --edit $1"
 
 
 
+## 五、第三方库集成
+
+### 5.1  vue.config.js配置
+
+vue.config.js有三种配置方式：
+
+* 方式一：直接通过CLI提供给我们的选项来配置：
+  * 比如publicPath：配置应用程序部署的子目录（默认是 `/`，相当于部署在 `https://www.my-app.com/`）；
+  * 比如outputDir：修改输出的文件夹；
+* 方式二：通过configureWebpack修改webpack的配置：
+  * 可以是一个对象，直接会被合并；
+  * 可以是一个函数，会接收一个config，可以通过config来修改配置；
+* 方式三：通过chainWebpack修改webpack的配置：
+  * 是一个函数，会接收一个基于  [webpack-chain](https://github.com/mozilla-neutrino/webpack-chain) 的config对象，可以对配置进行修改；
+
+```javascript
+const path = require('path')
+
+module.exports = {
+  // 方式一: 默认配置
+  outputDir: './build',
+  // 配置方式二: 将现有的配置合并到webpack中
+  // configureWebpack: {
+  //   resolve: {
+  //     alias: {
+  //       views: '@/views'
+  //     }
+  //   }
+  // }
+  // configureWebpack: (config) => {
+  //   config.resolve.alias = {
+  //     '@': path.resolve(__dirname, 'src'),
+  //     views: '@/views'
+  //   }
+  // },
+  // 配置方式三: 支持链式调用三
+  chainWebpack: (config) => {
+    config.resolve.alias.set('@', path.resolve(__dirname, 'src')).set('views', '@/views')
+  }
+}
+```
+
+### 5.2 vue-router集成
+
+安装vue-router的最新版本：
+
+```shell
+npm install vue-router@next
+```
+
+创建router对象：
+
+```javascript
+import { createRouter, createWebHashHistory } from 'vue-router'
+import { RouteRecordRaw } from 'vue-router'
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    redirect: '/main'
+  },
+  {
+    path: '/main',
+    component: () => import('../views/main/main.vue')
+  },
+  {
+    path: '/login',
+    component: () => import('../views/login/login.vue')
+  }
+]
+
+const router = createRouter({
+  routes,
+  history: createWebHashHistory()
+})
+
+export default router
+```
+
+引入router：
+
+```javascript
+import router from './router'
+
+createApp(App).use(router).mount('#app')
+```
+
+在App.vue中配置跳转：
+
+```html
+<template>
+  <div id="app">
+    <router-link to="/login">登录</router-link>
+    <router-link to="/main">首页</router-link>
+    <router-view></router-view>
+  </div>
+</template>
+```
+
+### 5.3  vuex集成
+
+安装vuex：
+
+```shell
+npm install vuex@next
+```
+
+创建store对象：
+
+```ts
+import { createStore } from 'vuex'
+
+const store = createStore({
+  state() {
+    return {
+      name: 'coderwhy'
+    }
+  }
+})
+
+export default store
+```
+
+安装store：
+
+```ts
+createApp(App).use(router).use(store).mount('#app')
+```
+
+在App.vue中使用：
+
+```html
+<h2>{{ $store.state.name }}</h2>
+```
+
+### 5.4 element-plus集成
+
+Element Plus，一套为开发者、设计师和产品经理准备的基于 Vue 3.0 的桌面端组件库：
+
+* 相信很多同学在Vue2中都使用过element-ui，而element-plus正是element-ui针对于vue3开发的一个UI组件库；
+* 它的使用方式和很多其他的组件库是一样的，所以学会element-plus，其他类似于ant-design-vue、NaiveUI、VantUI都是差不多的；
+
+安装element-plus
+
+```shell
+npm install element-plus
+```
+
+#### 5.4.1 全局引入
+
+一种引入element-plus的方式是全局引入，代表的含义是所有的组件和插件都会被自动注册：
+
+```js
+import ElementPlus from 'element-plus'
+import 'element-plus/lib/theme-chalk/index.css'
+
+import router from './router'
+import store from './store'
+
+createApp(App).use(router).use(store).use(ElementPlus).mount('#app')
+```
+
+#### 5.4.2 按需引入
+
+也就是在开发中用到某个组件对某个组件进行引入：
+
+```vue
+<template>
+  <div id="app">
+    <router-link to="/login">登录</router-link>
+    <router-link to="/main">首页</router-link>
+    <router-view></router-view>
+
+    <h2>{{ $store.state.name }}</h2>
+
+    <el-button>默认按钮</el-button>
+    <el-button type="primary">主要按钮</el-button>
+    <el-button type="success">成功按钮</el-button>
+    <el-button type="info">信息按钮</el-button>
+    <el-button type="warning">警告按钮</el-button>
+    <el-button type="danger">危险按钮</el-button>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+
+import { ElButton } from 'element-plus'
+
+export default defineComponent({
+  name: 'App',
+  components: {
+    ElButton
+  }
+})
+</script>
+
+<style lang="less">
+</style>
+```
+
+
+
+但是我们会发现是没有对应的样式的，引入样式有两种方式：
+
+* 全局引用样式（像之前做的那样）；
+* 局部引用样式；
+
+1.首先你需要安装`unplugin-vue-components` 和 `unplugin-auto-import`这两款插件
+
+```shell
+npm install -D unplugin-vue-components unplugin-auto-import
+```
+
+2.配置vue.config.js
+
+```js
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+
+module.exports = {
+  // ...
+  plugins: [
+    AutoImport({
+      resolvers: [ElementPlusResolver()],
+    }),
+    Components({
+      resolvers: [ElementPlusResolver()],
+    }),
+  ],
+}
+```
+
+![image-20230408104645031](./assets/image-20230408104645031.png)
+
+
+
+### 5.5 axios集成
+
+安装axios：
+
+```shell
+npm install axios
+```
+
+封装axios：
+
+```ts
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
+import { Result } from './types'
+import { useUserStore } from '/@/store/modules/user'
+
+class HYRequest {
+  private instance: AxiosInstance
+
+  private readonly options: AxiosRequestConfig
+
+  constructor(options: AxiosRequestConfig) {
+    this.options = options
+    this.instance = axios.create(options)
+
+    this.instance.interceptors.request.use(
+      (config) => {
+        const token = useUserStore().getToken
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
+        return config
+      },
+      (err) => {
+        return err
+      }
+    )
+
+    this.instance.interceptors.response.use(
+      (res) => {
+        // 拦截响应的数据
+        if (res.data.code === 0) {
+          return res.data.data
+        }
+        return res.data
+      },
+      (err) => {
+        return err
+      }
+    )
+  }
+
+  request<T = any>(config: AxiosRequestConfig): Promise<T> {
+    return new Promise((resolve, reject) => {
+      this.instance
+        .request<any, AxiosResponse<Result<T>>>(config)
+        .then((res) => {
+          resolve((res as unknown) as Promise<T>)
+        })
+        .catch((err) => {
+          reject(err)
+        })
+    })
+  }
+
+  get<T = any>(config: AxiosRequestConfig): Promise<T> {
+    return this.request({ ...config, method: 'GET' })
+  }
+
+  post<T = any>(config: AxiosRequestConfig): Promise<T> {
+    return this.request({ ...config, method: 'POST' })
+  }
+
+  patch<T = any>(config: AxiosRequestConfig): Promise<T> {
+    return this.request({ ...config, method: 'PATCH' })
+  }
+
+  delete<T = any>(config: AxiosRequestConfig): Promise<T> {
+    return this.request({ ...config, method: 'DELETE' })
+  }
+}
+
+export default HYRequest
+```
+
+
+
+## 六、项目基础配置
+
+### 6.1 引入windicss工具库和配置
+
+#### 6.1.1 访问windicss工具库官网
+
+- 英文官网: https://windicss.org/
+
+- 中文官网: https://cn.windicss.org/
+
+#### 6.1.2  安装windicss
+
+```shell
+npm i -D windicss-webpack-plugin
+```
+
+#### 6.1.3 引入windicss插件
+
+`vue.config.js`
+
+```javascript
+const { defineConfig } = require('@vue/cli-service')
+const WindiCSSWebpackPlugin = require('windicss-webpack-plugin')
+const AutoImport = require('unplugin-auto-import/webpack')
+const Components = require('unplugin-vue-components/webpack')
+const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
+
+const path = require('path')
+module.exports = defineConfig({
+  transpileDependencies: true,
+  // 方式一: 使用vue-cli的选项来进行配置
+  publicPath: './',
+  // 方式二:
+  configureWebpack: {
+    resolve: {
+      alias: {
+        com: '@/components'
+      }
+    },
+    plugins: [
+      new WindiCSSWebpackPlugin(),
+      AutoImport({
+        resolvers: [ElementPlusResolver()]
+      }),
+      Components({
+        resolvers: [ElementPlusResolver()]
+      })
+    ]
+  },
+  // configureWebpack: (config) => {
+  //   config.resolve.alias = {
+  //     '@': path.resolve(__dirname, 'src/components')
+  //   }
+  // },
+  // 方法三:
+  // chainWebpack: (config) => {
+  //   config.resolve.alias
+  //     .set('@', path.resolve(__dirname, 'src'))
+  //     .set('views', path.resolve(__dirname, 'src/views'))
+  // },
+  outputDir: 'build',
+  devServer: {
+    // 设置端口号 8888
+    port: 8888,
+    // 是否自动打开浏览器并运行
+    open: true,
+    // 设置主机名
+    host: 'localhost'
+  },
+  // 关闭eslint
+  lintOnSave: false
+})
+// 4.0 5.0
+// 1. 处理跨域
+// 2. 文件是干嘛的?
+// 3. webpack --- 打包构建 --- nodejs
+// 4. 同源策略? 域名、 协议、端口号  同源   跨域
+// 跨域 只存在浏览器端
+// 后端 没有
+// nodejs   ---- 服务端  ---    第三方接口的数据  -》 接口
+// vue-cli webpack5.0
+// 不想用它
+// 9999
+// webpack   非常     vite
+// process.env.NODE_ENV development production
+// development 开发环境 开发模式
+// production 生产环境 线上环境
+
+```
+
+`main.js`
+
+```javascript
+import 'windi.css'
+```
+
+注: 在`app.use(ElementPlus)`下面引入
+
+#### 6.1.4 vscode中安装windicss插件
+
+插件中搜索`windicss`
+
+
+
+### 6.2 windicss小案例和@apply简化代码
+
+#### 6.2.1 windicss小案例
+
+1.1 先创建一个普通按钮
+
+```vue
+<button>按钮</button>
+```
+
+1.2 使用windicss提供的样式
+
+设置按钮背景颜色
+
+```vue
+<button class=" bg-purple-500">按钮</button>
+```
+
+设置字体颜色
+
+```vue
+<button class=" bg-purple-500 text-indigo-50">按钮</button>
+```
+
+设置按钮间距
+
+```vue
+<button class=" bg-purple-500 text-indigo-50 px-4 py-2">按钮</button>
+```
+
+设置按钮圆角
+
+```vue
+<button class=" bg-purple-500 text-indigo-50 px-4 py-2 rounded">按钮</button>
+```
+
+鼠标移入颜色变深
+
+```vue
+<button class=" bg-purple-500 text-indigo-50 px-4 py-2 rounded hover:( bg-purple-900)">按钮</button>
+```
+
+鼠标移入颜色变深时希望有动画效果
+
+```vue
+<button class=" bg-purple-500 text-indigo-50 px-4 py-2 rounded transition-all hover:( bg-purple-900) ">按钮</button>
+```
+
+延长动画过渡时间
+
+```vue
+<button class=" bg-purple-500 text-indigo-50 px-4 py-2 rounded duration-150 transition-all hover:( bg-purple-900) ">按钮</button>
+```
+
+点击按钮时希望有轮廓
+
+```vue
+<button class=" bg-purple-500 text-indigo-50 px-4 py-2 rounded duration-150 transition-all hover:( bg-purple-900) focus:(ring-8)">按钮</button>
+```
+
+设置点击按钮时轮廓颜色
+
+```vue
+<button class=" bg-purple-500 text-indigo-50 px-4 py-2 rounded duration-150 transition-all hover:( bg-purple-900) focus:(ring-8 ring-yellow-500)">按钮</button>
+```
+
+#### 6.2.2 抽离所有类名
+
+剪切刚才定义的所有类名, 重新定一个类名为`btn`
+
+```vue
+<button class="btn">按钮</button>
+```
+
+在style中使用`@apply`方法抽离类名
+
+```css
+<style>
+.btn{
+  @apply bg-purple-500 text-indigo-50 px-4 py-2 rounded duration-150 transition-all hover:( bg-purple-900) focus:(ring-8 ring-yellow-500);
+}
+</style>
+```
+
+在浏览器中预览
+
+最后,大家就会这样写我们的代码结构就非常简洁了,并且页大大的提高了代码的可读性,以及可维护性
+
+
+
+### 6.3 路由配置和404页面捕获
+
+#### 6.3.1 创建后台首页页面
+
+在src目录下创建`pages目录,在pages目录下创建index.vue文件`
+
+`index.vue`
+
+```vue
+<template>
+	<div>
+  	后台首页
+	</div>
+</template>
+```
+
+
+
+#### 6.3.2 配置首页路由
+
+`router/index.js`
+
+```javascript
+import Index from "~/pages/index.vue"
+
+const routes = [
+  {
+    path : "/",
+    component : Index
+  }
+]
+```
+
+`App.vue`
+
+```vue
+<template>
+	<router-view></router-view>
+</template>
+```
+
+
+
+#### 6.3.3 创建about页面
+
+`在pages目录下创建about.vue文件`
+
+`about.vue`
+
+```vue
+<template>
+	<div>
+  	关于我们
+	</div>
+</template>
+```
+
+
+
+#### 6.3.4 配置about页面路由
+
+`router/index.js`
+
+```javascript
+import Index from "~/pages/index.vue"
+import About from "~/pages/about.vue"
+
+const routes = [
+  {
+    path : "/",
+    component : Index
+  },
+  {
+    path : "/about",
+    component : About
+  }
+]
+```
+
+
+
+#### 6.3.5 创建404页面
+
+`在pages目录下创建404.vue文件`
+
+```vue
+<template>
+	<div>
+  	404
+	</div>
+</template>
+```
+
+
+
+#### 6.3.6 配置404页面路由
+
+404路由配置参考文档:
+
+https://router.vuejs.org/zh/guide/essentials/dynamic-matching.html#%E6%8D%95%E8%8E%B7%E6%89%80%E6%9C%89%E8%B7%AF%E7%94%B1%E6%88%96-404-not-found-%E8%B7%AF%E7%94%B1
+
+`router/index.js`
+
+```javascript
+import Index from "~/pages/index.vue"
+import About from "~/pages/about.vue"
+import NotFound from "~/pages/404.vue"
+
+const routes = [
+  {
+    path : "/",
+    component : Index
+  },
+  {
+    path : "/about",
+    component : About
+  },
+  { 
+    path: '/:pathMatch(.*)*', 
+   	name: 'NotFound', 
+   	component: NotFound 
+  }
+]
+```
+
+
+
+#### 6.3.7 实现404页面布局
+
+`404.vue`
+
+```vue
+<template>
+	<div>
+  	<el-result
+        icon="warning"
+        title="404提示"
+        sub-title="你找的页面走丢了~"
+      >
+        <template #extra>
+          <el-button type="primary">回到首页</el-button>
+        </template>
+      </el-result>
+	</div>
+</template>
+```
+
+
+
+#### 6.3.8 点击回到首页按钮跳转到首页
+
+```vue
+<template>
+	<div>
+  	<el-result
+        icon="warning"
+        title="404提示"
+        sub-title="你找的页面走丢了~"
+      >
+        <template #extra>
+          <el-button type="primary" @click="$router.push('/')">回到首页</el-button>
+        </template>
+      </el-result>
+	</div>
+</template>
+```
+

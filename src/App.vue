@@ -1,26 +1,19 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <p>hello</p>
-  <p>123</p>
-  <p>789</p>
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  <div>
+    <div
+      class="rounded-3xl bg-dark-300"
+      style="width: 200px; height: 200px"
+    ></div>
+    <router-view></router-view>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
 
 export default defineComponent({
   name: 'App',
-  components: {
-    HelloWorld
-  },
-  methods: {
-    test() {
-      var a = 10
-      console.log(a)
-    }
-  }
+  components: {}
 })
 
 // 代码检测工具  --  规则
