@@ -548,6 +548,10 @@ module.exports = {
 
 ### 5.5 axios集成
 
+#### 5.5.1 为什么要对axios进行封装?
+
+![image-20230408113444872](./assets/image-20230408113444872.png)
+
 安装axios：
 
 ```shell
@@ -991,5 +995,2189 @@ const routes = [
       </el-result>
 	</div>
 </template>
+```
+
+
+
+## 七、登录页与功能实现
+
+### 7.1 登录页开发
+
+#### 7.1.1 创建登录页面
+
+`/pages/login.vue`
+
+```vuev
+<template>
+	<div>
+		登录
+	</div>
+</template>
+```
+
+
+
+#### 7.1.2 删除about页面
+
+删除about页面以及删除about路由
+
+
+
+#### 7.1.3 配置登录页面路由
+
+```javascript
+import Login from "~/pages/login.vue"
+
+const routes = [
+  {
+    path : '/login',
+    component : Login
+  }
+]
+
+```
+
+
+
+#### 7.1.4 使用element-plus的Layout组件实现登录页面布局
+
+实现页面整体布局
+
+`pages/login.vue`
+
+```vue
+<template>
+	<el-row style="min-height: 100vh;" class="bg-indigo-500">
+    <el-col :span="16">左边</el-col>
+    <el-col :span="8" class="bg-light-50">右边</el-col>
+  </el-row>  
+</template>
+```
+
+
+
+使用windicss的`min-h-screen`实现页面高度100%
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :span="16">左边</el-col>
+    <el-col :span="8" class="bg-light-50">右边</el-col>
+  </el-row>  
+</template>
+```
+
+
+
+实现左右两侧内容说明并且垂直居中
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :span="16" class="flex items-center justify-center">
+      左边
+ 		</el-col>
+    <el-col :span="8" class="bg-light-50 flex items-center justify-center flex-col">
+      右边
+  	</el-col>
+  </el-row>  
+</template>
+```
+
+
+
+实现左侧标题与描述布局
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :span="16" class="flex items-center justify-center">
+      <div>
+      	<div class="font-bold text-5xl text-light-50 mb-4">
+  				欢迎光临
+        </div>
+        <div class="text-gray-200 text-sm">
+          《vue3 + vite》实战项目演示网站
+        </div>  
+  		</div>  
+ 		</el-col>
+    <el-col :span="8" class="bg-light-50 flex items-center justify-center flex-col">
+      右边
+  	</el-col>
+  </el-row>  
+</template>
+```
+
+
+
+实现右侧登录表单布局1
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :span="16" class="flex items-center justify-center">
+      <div>
+      	<div class="font-bold text-5xl text-light-50 mb-4">
+  				欢迎光临
+        </div>
+        <div class="text-gray-200 text-sm">
+          《vue3 + vite》实战项目演示网站
+        </div>  
+  		</div>  
+ 		</el-col>
+    <el-col :span="8" class="bg-light-50 flex items-center justify-center flex-col">
+      <h2>欢迎回来</h2>
+      <div>
+      	<span></span>  
+        <span>账号密码登录</span>  
+        <span></span>  
+  		</div>
+      <el-form :model="form" label-width="120px">
+        <el-form-item label="Activity name">
+          <el-input v-model="form.name" />
+        </el-form-item>
+        <el-form-item label="Activity zone">
+          <el-select v-model="form.region" placeholder="please select your zone">
+            <el-option label="Zone one" value="shanghai" />
+            <el-option label="Zone two" value="beijing" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="Activity time">
+          <el-col :span="11">
+            <el-date-picker
+              v-model="form.date1"
+              type="date"
+              placeholder="Pick a date"
+              style="width: 100%"
+            />
+          </el-col>
+          <el-col :span="2" class="text-center">
+            <span class="text-gray-500">-</span>
+          </el-col>
+          <el-col :span="11">
+            <el-time-picker
+              v-model="form.date2"
+              placeholder="Pick a time"
+              style="width: 100%"
+            />
+          </el-col>
+        </el-form-item>
+        <el-form-item label="Instant delivery">
+          <el-switch v-model="form.delivery" />
+        </el-form-item>
+        <el-form-item label="Activity type">
+          <el-checkbox-group v-model="form.type">
+            <el-checkbox label="Online activities" name="type" />
+            <el-checkbox label="Promotion activities" name="type" />
+            <el-checkbox label="Offline activities" name="type" />
+            <el-checkbox label="Simple brand exposure" name="type" />
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="Resources">
+          <el-radio-group v-model="form.resource">
+            <el-radio label="Sponsor" />
+            <el-radio label="Venue" />
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="Activity form">
+          <el-input v-model="form.desc" type="textarea" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onSubmit">Create</el-button>
+          <el-button>Cancel</el-button>
+        </el-form-item>
+      </el-form>
+  	</el-col>
+  </el-row>  
+</template>
+
+<script setup>
+import { reactive } from 'vue'
+
+// do not use same name with ref
+const form = reactive({
+  name: '',
+  region: '',
+  date1: '',
+  date2: '',
+  delivery: false,
+  type: [],
+  resource: '',
+  desc: '',
+})
+
+const onSubmit = () => {
+  console.log('submit!')
+}
+</script>
+```
+
+
+
+实现右侧登录表单布局2
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :span="16" class="flex items-center justify-center">
+      <div>
+      	<div class="font-bold text-5xl text-light-50 mb-4">
+  				欢迎光临
+        </div>
+        <div class="text-gray-200 text-sm">
+          《vue3 + vite》实战项目演示网站
+        </div>  
+  		</div>  
+ 		</el-col>
+    <el-col :span="8" class="bg-light-50 flex items-center justify-center flex-col">
+      <h2 class="font-bold text-3xl text-gray-800">欢迎回来</h2>
+      <div class="flex items-center justift-center my-5 text-gray-300 space-x-2">
+      	<span class="h-[1px] w-16 bg-gray-200"></span>  
+        <span>账号密码登录</span>  
+        <span class="h-[1px] w-16 bg-gray-200"></span> 
+  		</div>
+      <el-form :model="form" class="w-[250px]">
+        <el-form-item>
+          <el-input v-model="form.username" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="form.password" placeholder="请输入密码"  />
+        </el-form-item>
+         <el-form-item>
+           <el-button round color="#626aef" class="w-[250px]" type="primary" @click="onSubmit">登 录</el-button>
+         </el-form-item>
+      </el-form>
+  	</el-col>
+  </el-row>  
+</template>
+
+<script setup>
+import { reactive } from 'vue'
+
+// do not use same name with ref
+const form = reactive({
+	username : '',
+	password : ''
+})
+
+const onSubmit = () => {
+  console.log('submit!')
+}
+</script>
+```
+
+
+
+### 7.2 登录页响应式处理
+
+#### 7.2.1 演示响应式效果
+
+http://shop.2yuecloud.com/#/
+
+#### 7.2.2 实现当屏幕分辨率大于1200时左侧16,右侧8
+
+`pages/login.vue`
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :lg="16" class="flex items-center justify-center">
+      <div>
+      	<div class="font-bold text-5xl text-light-50 mb-4">
+  				欢迎光临
+        </div>
+        <div class="text-gray-200 text-sm">
+          《vue3 + vite》实战项目演示网站
+        </div>  
+  		</div>  
+ 		</el-col>
+    <el-col :lg="8" class="bg-light-50 flex items-center justify-center flex-col">
+      <h2 class="font-bold text-3xl text-gray-800">欢迎回来</h2>
+      <div class="flex items-center justift-center my-5 text-gray-300 space-x-2">
+      	<span class="h-[1px] w-16 bg-gray-200"></span>  
+        <span>账号密码登录</span>  
+        <span class="h-[1px] w-16 bg-gray-200"></span> 
+  		</div>
+      <el-form :model="form" class="w-[250px]">
+        <el-form-item>
+          <el-input v-model="form.username" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="form.password" placeholder="请输入密码"  />
+        </el-form-item>
+         <el-form-item>
+           <el-button round color="#626aef" class="w-[250px]" type="primary" @click="onSubmit">登 录</el-button>
+         </el-form-item>
+      </el-form>
+  	</el-col>
+  </el-row>  
+</template>
+```
+
+
+
+#### 7.2.3 实现当屏幕分辨率大于992px时左侧12,右侧12
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :lg="16" class="flex items-center justify-center">
+      <div>
+      	<div class="font-bold text-5xl text-light-50 mb-4">
+  				欢迎光临
+        </div>
+        <div class="text-gray-200 text-sm">
+          《vue3 + vite》实战项目演示网站
+        </div>  
+  		</div>  
+ 		</el-col>
+    <el-col :lg="8" class="bg-light-50 flex items-center justify-center flex-col">
+      <h2 class="font-bold text-3xl text-gray-800">欢迎回来</h2>
+      <div class="flex items-center justift-center my-5 text-gray-300 space-x-2">
+      	<span class="h-[1px] w-16 bg-gray-200"></span>  
+        <span>账号密码登录</span>  
+        <span class="h-[1px] w-16 bg-gray-200"></span> 
+  		</div>
+      <el-form :model="form" class="w-[250px]">
+        <el-form-item>
+          <el-input v-model="form.username" placeholder="请输入用户名" />
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="form.password" placeholder="请输入密码"  />
+        </el-form-item>
+         <el-form-item>
+           <el-button round color="#626aef" class="w-[250px]" type="primary" @click="onSubmit">登 录</el-button>
+         </el-form-item>
+      </el-form>
+  	</el-col>
+  </el-row>  
+</template>
+```
+
+
+
+### 7.3 全局引入图标
+
+#### 7.3.1 访问element-plus官网,查看icon图标组件
+
+https://element-plus.org/zh-CN/component/icon.html#%E4%BD%BF%E7%94%A8%E5%9B%BE%E6%A0%87
+
+
+
+#### 7.3.2 安装icon图标
+
+`npm install @element-plus/icons-vue`
+
+
+
+#### 7.3.3 查看input输入框引入图标的方式,并使用前缀的方式显示登录表单输入图标
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :lg="16" class="flex items-center justify-center">
+      <div>
+      	<div class="font-bold text-5xl text-light-50 mb-4">
+  				欢迎光临
+        </div>
+        <div class="text-gray-200 text-sm">
+          《vue3 + vite》实战项目演示网站
+        </div>  
+  		</div>  
+ 		</el-col>
+    <el-col :lg="8" class="bg-light-50 flex items-center justify-center flex-col">
+      <h2 class="font-bold text-3xl text-gray-800">欢迎回来</h2>
+      <div class="flex items-center justift-center my-5 text-gray-300 space-x-2">
+      	<span class="h-[1px] w-16 bg-gray-200"></span>  
+        <span>账号密码登录</span>  
+        <span class="h-[1px] w-16 bg-gray-200"></span> 
+  		</div>
+      <el-form :model="form" class="w-[250px]">
+        <el-form-item>
+          <el-input v-model="form.username" placeholder="请输入用户名" >
+            <template #prefix>
+              <el-icon class="el-input__icon"><search /></el-icon>
+            </template>
+ 	 				</el-input>  
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="form.password" placeholder="请输入密码"  />
+        </el-form-item>
+         <el-form-item>
+           <el-button round color="#626aef" class="w-[250px]" type="primary" @click="onSubmit">登 录</el-button>
+         </el-form-item>
+      </el-form>
+  	</el-col>
+  </el-row>  
+</template>
+
+<script setup >
+
+import { Search } from '@element-plus/icons-vue'
+
+</script>
+```
+
+
+
+#### 7.3.4 将search图标替换成演示效果表单中的图标
+
+```vue
+<template>
+	<el-row  class="bg-indigo-500 min-h-screen">
+    <el-col :lg="16" class="flex items-center justify-center">
+      <div>
+      	<div class="font-bold text-5xl text-light-50 mb-4">
+  				欢迎光临
+        </div>
+        <div class="text-gray-200 text-sm">
+          《vue3 + vite》实战项目演示网站
+        </div>  
+  		</div>  
+ 		</el-col>
+    <el-col :lg="8" class="bg-light-50 flex items-center justify-center flex-col">
+      <h2 class="font-bold text-3xl text-gray-800">欢迎回来</h2>
+      <div class="flex items-center justift-center my-5 text-gray-300 space-x-2">
+      	<span class="h-[1px] w-16 bg-gray-200"></span>  
+        <span>账号密码登录</span>  
+        <span class="h-[1px] w-16 bg-gray-200"></span> 
+  		</div>
+      <el-form :model="form" class="w-[250px]">
+        <el-form-item>
+          <el-input v-model="form.username" placeholder="请输入用户名" >
+            <template #prefix>
+              <el-icon><user /></el-icon>
+            </template>
+ 	 				</el-input>  
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="form.password" placeholder="请输入密码"  >
+          	<template #prefix>
+              <el-icon><lock /></el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+         <el-form-item>
+           <el-button round color="#626aef" class="w-[250px]" type="primary" @click="onSubmit">登 录</el-button>
+         </el-form-item>
+      </el-form>
+  	</el-col>
+  </el-row>  
+</template>
+
+<script setup >
+
+import { User, Lock } from '@element-plus/icons-vue'
+
+</script>
+```
+
+
+
+#### 7.3.5 注册所有图标
+
+`main.js`
+
+```javascript
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+const app = createApp(App)
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+```
+
+
+
+#### 7.3.6 移除登录页面中引入的图标
+
+移除这段代码
+
+```javascript
+import { User, Lock } from '@element-plus/icons-vue'
+```
+
+#### 7.3.7 刷新浏览器测试图标是否显示
+
+
+
+### 7.4 结合@apply实现样式抽离
+
+#### 7.4.1 实现样式抽离
+
+```vue
+<template>
+	<el-row  class="login-container">
+    <el-col :lg="16" class="left">
+      <div>
+      	<div>
+  				欢迎光临
+        </div>
+        <div>
+          《vue3 + vite》实战项目演示网站
+        </div>  
+  		</div>  
+ 		</el-col>
+    <el-col :lg="8" class="right ">
+      <h2 class="title">欢迎回来</h2>
+      <div>
+      	<span class="line"></span>  
+        <span>账号密码登录</span>  
+        <span class="line"></span> 
+  		</div>
+      <el-form :model="form" class="w-[250px]">
+        <el-form-item>
+          <el-input v-model="form.username" placeholder="请输入用户名" >
+            <template #prefix>
+              <el-icon><user /></el-icon>
+            </template>
+ 	 				</el-input>  
+        </el-form-item>
+        <el-form-item>
+          <el-input v-model="form.password" placeholder="请输入密码"  >
+          	<template #prefix>
+              <el-icon><lock /></el-icon>
+            </template>
+          </el-input>
+        </el-form-item>
+         <el-form-item>
+           <el-button round color="#626aef" class="w-[250px]" type="primary" @click="onSubmit">登 录</el-button>
+         </el-form-item>
+      </el-form>
+  	</el-col>
+  </el-row>  
+</template>
+
+<style scoped>
+  .login-container{
+    @apply bg-indigo-500 min-h-screen;
+  }
+  .login-container .left, .login-container .right{
+    @apply flex items-center justify-center;
+  }
+  .login-container .right{
+   	@apply bg-light-50  flex-col; 
+  }
+  .left>div>div:first-child{
+    @apply font-bold text-5xl text-light-50 mb-4;
+  }
+  .left>div>div:last-child{
+    @apply text-gray-200 text-sm;
+  }
+  .right .title{
+    @apply font-bold text-3xl text-gray-800;
+  }
+  .right div{
+    @apply flex items-center justift-center my-5 text-gray-300 space-x-2;
+  }
+  .right .line{
+    @apply h-[1px] w-16 bg-gray-200;
+  }
+</style>
+```
+
+
+
+### 7.5 setup语法糖与组合式API
+
+#### 7.5.1 访问vue3官网,查看setup文档
+
+https://cn.vuejs.org/api/sfc-script-setup.html
+
+
+
+#### 7.5.2 setup语法糖讲解
+
+顶层的绑定会被暴露给模板(案例演示)
+
+`index.vue`
+
+```vue
+<template>
+	<div>
+  	后台首页
+    {{count}}
+    
+    <el-button @click="addCount">{{count}}</el-button>
+    
+    <hello-world></hello-world>
+  </div>
+</template>
+
+<script setup>
+  // 引入的组件无需注册,直接可以在组件中使用
+  import HelloWorld from "~/components/HelloWorld.vue"
+  
+  // 定义的变量可以直接在模版中展示
+	let count = 1
+  
+  // 定义的方法可以直接在模版中调用
+  function addCount(){
+    console.log("addCount", )
+  }
+</script>
+```
+
+
+
+#### 7.5.3 响应式API
+
+接下来我们需要使用响应式api来达到数据与视图的双向更新
+
+
+
+下面的这个案例,我们在点击按钮时,让count++,但是我们发现视图并没有发生变化
+
+`index.vue`
+
+```vue
+<template>
+	<div>
+  	后台首页
+    {{count}}
+    
+    <el-button @click="addCount">{{count}}</el-button>
+    
+    <hello-world></hello-world>
+  </div>
+</template>
+
+<script setup>
+  // 引入的组件无需注册,直接可以在组件中使用
+  // import HelloWorld from "~/components/HelloWorld.vue"
+  
+  // 定义的变量可以直接在模版中展示
+	let count = 1
+  
+  // 定义的方法可以直接在模版中调用
+  function addCount(){
+    console.log("addCount", )
+    count++
+    console.log("count", count)
+  }
+</script>
+```
+
+
+
+如果想达到视图与数据的双向更新,我们可以使用vue3响应式api中的`ref`与`reactive`
+
+
+
+使用`ref`
+
+`index.vue`
+
+```vue
+<template>
+	<div>
+  	后台首页
+    {{count}}
+    
+    <el-button @click="addCount">{{count}}</el-button>
+    
+    <hello-world></hello-world>
+  </div>
+</template>
+
+<script setup>
+  // 引入的组件无需注册,直接可以在组件中使用
+  // import HelloWorld from "~/components/HelloWorld.vue"
+  
+  // 引入ref
+  import {ref} from "vue"
+  
+  // 定义的变量可以直接在模版中展示
+	let count = ref(1)
+  
+  // 定义的方法可以直接在模版中调用
+  function addCount(){
+    console.log("addCount", )
+    count.value++
+    console.log("count", count.value)
+  }
+</script>
+```
+
+
+
+使用`reactive`
+
+```vue
+<template>
+	<div>
+  	后台首页
+    {{count}}
+    
+    <el-button @click="addCount">{{count}}</el-button>
+    
+    <el-button type="primary" @click="addCount2">{{form.count}}</el-button>
+   
+  </div>
+</template>
+
+<script setup>
+  // 引入的组件无需注册,直接可以在组件中使用
+  // import HelloWorld from "~/components/HelloWorld.vue"
+  
+  // 引入ref
+  import {ref, reactive} from "vue"
+  
+  // reactive只能用来对引用数据类型进行响应式处理, 普通数据类型不能使用
+  
+  // 定义的变量可以直接在模版中展示
+	let count = ref(1)
+  
+  // 定义的方法可以直接在模版中调用
+  function addCount(){
+    console.log("addCount", )
+    count.value++
+    console.log("count", count.value)
+  }
+  
+  let form = reactive({
+    count : 2
+  })
+  
+  function addCount2(){
+    form.count++
+    console.log("form.count",form.count )
+  }
+</script>
+```
+
+
+
+### 7.6 登录表单验证处理
+
+#### 7.6.1. 访问element-plus官网
+
+https://element-plus.org/zh-CN/
+
+
+
+#### 7.6.2 查看Form表单组件
+
+https://element-plus.org/zh-CN/component/form.html#%E8%A1%A8%E5%8D%95%E6%A0%A1%E9%AA%8C
+
+
+
+#### 7.6.3 在el-form标签上定义rules属性
+
+```vue
+<template>
+	<el-form ref="ruleFormRef" :model="ruleForm" :rules="rules"
+</template>
+
+<script setup>
+	const rules = {
+    username : [],
+    password : []
+  }
+</script>          
+
+          
+```
+
+
+
+#### 7.6.4 在el-form-item标签上指定props
+
+```vue
+<el-form-item props="username"></el-form-item>
+<el-form-item props="password"></el-form-item>
+```
+
+
+
+
+
+#### 7.6.5 定义表单验证规则
+
+```vue
+<script setup>
+	const rules = {
+    username : [
+      { required: true, message: '用户名不能为空', trigger: 'blur' },
+      // 只是演示使用,没有必要添加这条规则
+      { min: 3, max: 5, message: '用户名长度时3-5个字符', trigger: 'blur' }
+    ],
+    password : [
+       { required: true, message: '密码不能为空', trigger: 'blur' },
+    ]
+  }
+</script> 
+```
+
+
+
+
+
+#### 7.6.6 点击登录按钮时,校验整个表单
+
+`在el-form标签上定义ref`
+
+```vue
+<el-form ref="formRef">
+```
+
+
+
+`对formRef进行响应式绑定,并实现整个表单校验`
+
+```vue
+<script setup>
+	const formRef = ref(null)
+  
+  const onSubmit = () => {
+    formRef.value.validate((valid)=>{
+      if(!valid){
+        return false
+      }
+      
+      console.log("验证通过")
+    })
+  }
+</script>
+```
+
+
+
+#### 7.6.7 将密码输入框修改为暗文
+
+`type="password"`
+
+`show-password`
+
+#### 7.6.8 去除表单首尾空格
+
+### 7.7 引入axios请求库和登录接口交互
+
+#### 1. 查看接口文档
+
+https://docs.apipost.cn/preview/60473d591fcbdab9/956470ddd0d00f54
+
+
+
+#### 2. 访问axios官网
+
+http://axios-js.com/
+
+
+
+#### 3. 安装axios
+
+`npm install axios`
+
+
+
+#### 4. 创建axios.js
+
+`在src目录下创建axios.js文件`
+
+
+
+#### 5. axios进行二次封装
+
+`src/axios.js`
+
+```javascript
+import axios from "axios"
+
+const service = axios.create({
+  baseURL : 'http://shopapi.2yuecloud.com'
+})
+
+export default service
+```
+
+
+
+#### 6. 创建api文件夹
+
+`在src目录下创建api文件夹`
+
+
+
+#### 7. api接口封装
+
+`在api文件夹内创建manager.js文件`
+
+```javascript
+import axios from "~/axios"
+
+// 登录接口
+export const login = (username, password) => {
+  return axios.post("/admin/login", {username, password})
+}
+```
+
+
+
+#### 8. 调用登录接口
+
+`login.vue`
+
+```vue
+<script setup>
+	import {login} from "~/api/manager.js"
+  
+  const onSubmit = () => {
+    formRef.validate((valid)=>{
+      if(!valid){
+        return false
+      }
+      
+      login(form.username, form.password).then(res=>{
+        console.log("res=>", res)
+      }).catch(error=>{
+        console.log("error=>",error)
+      })
+    })
+  }
+</script>
+```
+
+
+
+#### 9. 在vite中配置跨域
+
+`vite.config.js`
+
+```javascript
+server : {
+	proxy : {
+    '/api': {
+        target: 'http://shopapi.2yuecloud.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      }
+  }
+}
+```
+
+
+
+#### 10. 修改baseURL
+
+`src/axios.js`
+
+```javascript
+const service = axios.create({
+	baseURL : '/api'
+})
+```
+
+
+
+#### 11. 重新启动项目
+
+`npm run dev`
+
+
+
+#### 12. 在catch中获取具体的错误信息
+
+`pages/login.vue`
+
+```javascript
+.catch(error=>{
+	console.log(error.response.data.msg)
+})
+```
+
+
+
+#### 13. 使用Notification进行错误信息提示
+
+`pages/login.vue`
+
+```javascript
+import { ElNotification } from 'element-plus'
+
+.catch(error=>{
+	console.log(error.response.data.msg)
+  ElNotification({
+    message: error.response.data.msg || '请求失败',
+    type: 'error',
+    duration : 3000
+  })
+})
+```
+
+
+
+#### 14. 获取请求成功的数据
+
+`pages/login.vue`
+
+```javascript
+.then(res=>{
+  console.log(res.data.data)
+  // 提示成功
+  
+  // 存储token和获取用户信息, 下节课讲
+  
+  // 跳转到后台首页
+})
+```
+
+
+
+#### 15. 使用Notification进行成功信息提示
+
+`pages/login.vue`
+
+```javascript
+.then(res=>{
+  console.log(res.data.data)
+  // 提示成功
+   ElNotification({
+    message: '登录成功',
+    type: 'success',
+    duration : 3000
+  })
+  // 存储token和获取用户信息, 下节课讲
+  
+  // 跳转到后台首页
+})
+```
+
+
+
+#### 16.引入useRouter,实现路由跳转
+
+`pages/login.vue`
+
+```javascript
+import {useRouter} from "~/router"
+
+const router = useRouter()
+
+.then(res=>{
+  console.log(res.data.data)
+  // 提示成功
+   ElNotification({
+    message: '登录成功',
+    type: 'success',
+    duration : 3000
+  })
+  // 存储token和获取用户信息, 下节课讲
+  
+  // 跳转到后台首页
+  router.push("/")
+})
+```
+
+
+
+### 7.8 引入cookie存储用户token
+
+#### 1. 访问VueUse官网
+
+https://vueuse.org/
+
+#### 2. 介绍VueUse
+
+VueUse是基于Vue3的composition api实现的一个工具库, VueUse将一些原本不支持响应式js的api变成支持响应式api, 使用VueUse可以大大的提高我们的开发效率
+
+
+
+#### 3. 使用VueUse中提供的cookie
+
+https://vueuse.org/integrations/usecookies/#usecookies
+
+
+
+#### 4. 安装@vueuse/integrations
+
+https://vueuse.org/integrations/readme.html
+
+`npm i @vueuse/integrations`
+
+
+
+#### 5. 安装useCookie
+
+`npm i universal-cookie`
+
+
+
+#### 6. 使用cookie
+
+`index.vue`
+
+```vue
+<template>
+	<el-button @click="set">设置</el-button>
+  <el-button @click="get">读取</el-button>
+  <el-button @click="remove">删除</el-button>
+</template>
+
+<script setup>
+  import { useCookies } from '@vueuse/integrations/useCookies'
+  const cookie = useCookies()
+  
+  // 查看cookie提供的方法
+  console.log("cookie", cookie)
+  
+  function set(){
+    cookie.set("admin-token", "123456")
+  }
+  
+  function get(){
+    console.log(cookie.get("admin-token"))
+  }
+  
+  function remove(){
+    cookie.remove("admin-token")
+  }
+</script>  
+```
+
+
+
+#### 7. 登录成功之后将token存储到cookie
+
+`login.vue`
+
+```vue
+<script setup>
+  import { useCookies } from '@vueuse/integrations/useCookies'
+  
+  
+  .then(response=>{
+    const cookie = useCookies()
+    cookie.set("admin-token", response.data.data.token)
+  })
+</script> 
+```
+
+#### 8. 在浏览器查看token是否存储成功
+
+
+
+### 7.9 请求拦截器和响应拦截器
+
+#### 1. 访问axios官网查看拦截器的使用
+
+www.axios-js.com
+
+
+
+#### 2. 封装请求拦截器与响应拦截器
+
+`src/axios.js`
+
+```javascript
+import axios from "axios"
+
+const service = axios.create({
+  baseURL : '/api'
+})
+
+// 请求拦截器
+service.interceptors.request.use(function (config) {
+    // Do something before request is sent
+    return config;
+  }, function (error) {
+    // Do something with request error
+    return Promise.reject(error);
+  });
+
+// 响应拦截器
+service.interceptors.response.use(function (response) {
+    // Do something with response data
+    return response;
+  }, function (error) {
+    // Do something with response error
+    return Promise.reject(error);
+  });
+
+export default service
+```
+
+
+
+#### 3. 优化响应结果
+
+`src/axios.js`
+
+```javascript
+import axios from "axios"
+
+const service = axios.create({
+  baseURL : '/api'
+})
+
+// 请求拦截器
+service.interceptors.request.use(function (config) {
+   
+    return config;
+  }, function (error) {
+  
+    return Promise.reject(error);
+  });
+
+// 响应拦截器
+service.interceptors.response.use(function (response) {
+    
+    return response.data.data;
+  }, function (error) {
+
+    return Promise.reject(error);
+  });
+
+export default service
+```
+
+
+
+#### 4. 优化登录页面获取的请求结果
+
+`login.vue`
+
+```vue
+<script setup>
+  .then(response=>{
+    const cookie = useCookie()
+    cookie.set("admin-token", response.token)
+  })
+</script>  
+```
+
+
+
+#### 5. 对响应的错误进行全局异常处理
+
+`src/axios.js`
+
+```javascript
+import axios from "axios"
+
+import { ElNotification } from 'element-plus'
+
+const service = axios.create({
+  baseURL : '/api'
+})
+
+// 请求拦截器
+service.interceptors.request.use(function (config) {
+   
+    return config;
+  }, function (error) {
+  
+    return Promise.reject(error);
+  });
+
+// 响应拦截器
+service.interceptors.response.use(function (response) {
+    
+    return response.data.data;
+  }, function (error) {
+		
+  	ElNotification({
+      message: error.response.data.msg || '请求失败',
+      type: 'error',
+      duration : 3000
+    })
+  
+    return Promise.reject(error);
+  });
+
+export default service
+```
+
+删除登录页面的`.catch`
+
+
+
+#### 6. 通过请求头携带token
+
+`src/axios.js`
+
+```javascript
+import axios from "axios"
+
+import { ElNotification } from 'element-plus'
+
+import { useCookies } from '@vueuse/integrations/useCookies'
+
+const service = axios.create({
+  baseURL : '/api'
+})
+
+// 请求拦截器
+service.interceptors.request.use(function (config) {
+   
+  	// 往header头自动添加token
+  	const cookie = use useCookies()
+  	const token = cookie.get("admin-token")
+    if(token){
+      config.headers["token"] = token
+    }
+  
+    return config;
+  }, function (error) {
+  
+    return Promise.reject(error);
+  });
+
+// 响应拦截器
+service.interceptors.response.use(function (response) {
+    
+    return response.data.data;
+  }, function (error) {
+		
+  	ElNotification({
+      message: error.response.data.msg || '请求失败',
+      type: 'error',
+      duration : 3000
+    })
+  
+    return Promise.reject(error);
+  });
+
+export default service
+```
+
+
+
+#### 7. 获取用户登录之后的信息
+
+封装用户登录信息接口
+
+`api/manager.js`
+
+```javascript
+export function getinfo(){
+  return axios.post('/admin/getinfo', )
+}
+```
+
+
+
+#### 8. 登录成功之后调用获取用户信息接口
+
+`login.vue`
+
+```vue
+<script setup>
+  import {login, getinfo} from "~/api/manager.js"
+  
+  .then(response=>{
+    // 存储token
+    const cookie = useCookie()
+    cookie.set("admin-token", response.token)
+    
+    // 获取用户信息
+    getinfo().then(response2=>{
+      console.log("response2=>", response2)
+    })
+  })
+</script>  
+```
+
+
+
+#### 9. 优化登录按钮,给登录按钮添加loading加载
+
+`login.vue`
+
+```vue
+<template>
+	<el-button :loading="loading">登 录</el-button>
+</template>
+
+<script setup>
+  import {login, getinfo} from "~/api/manager.js"
+  
+  const loading = ref(false)
+  
+  const onSubmit = () => {
+    formRef.value.validate(valid=>{
+      
+      if(!valid) return false
+      
+      // 开启loading
+      loading.value = true
+      
+      .then(response=>{
+        // 存储token
+        const cookie = useCookie()
+        cookie.set("admin-token", response.token)
+
+        // 获取用户信息
+        getinfo().then(response2=>{
+          console.log("response2=>", response2)
+        })
+      }).finally(()=>{
+        // 关闭loading
+        loading.value = false
+      })
+    })
+  }
+  
+  
+</script>  
+```
+
+### 7.10 常用工具库封装
+
+#### 1. 封装cookie
+
+`composables/auth.js`
+
+```javascript  
+import { useCookies } from '@vueuse/integrations/useCookies'
+const TokenKey = "admin-token"
+const cookie = useCookies()
+
+// 获取token
+export function getToken(){
+  return cookie.get(TokenKey)
+}
+// 设置token
+export function getToken(token){
+  return cookie.set(TokenKey,token)
+}
+
+// 清除token
+export function getToken(){
+  return cookie.remove(TokenKey)
+}
+
+```
+
+
+
+#### 2. 优化登录页cookie的使用
+
+`login.vue`
+
+```javascript
+import {setToken} from "~/composables/auth"
+
+.then(response=>{
+  setToken(response.token)
+})
+```
+
+
+
+#### 3. 优化请求拦截器cookie的使用
+
+`src/axios.js`
+
+```javascript
+import {getToken} from "~/composables/auth"
+
+// 请求拦截器
+const token = getToken()
+if(token){
+  config.headers["token"] = token
+}
+```
+
+
+
+#### 4. 封装统一消息提示
+
+`composables/util.js`
+
+```javascript
+import { ElNotification } from 'element-plus'
+
+// 消息提示方法
+export function toast(message, type = "success", dangerouslyUseHTMLString = false){
+  ElNotification({
+    message,
+    type,
+    duration : 3000,
+    dangerouslyUseHTMLString
+  })
+}
+
+```
+
+
+
+#### 5. 优化响应拦截器消息提示
+
+`src/axios.js`
+
+```javascript
+import {toast} from "~/composables/util.js"
+
+// 响应拦截器
+toast(error.response.data.msg || '请求失败', 'error')
+```
+
+
+
+#### 6. 优化登录页消息提示
+
+跟上面同理
+
+### 7.11 引入vuex状态管理用户信息
+
+#### 1. 访问vuex官网
+
+https://vuex.vuejs.org/zh/
+
+
+
+#### 2. 安装vuex
+
+`npm install vuex@next --save`
+
+
+
+#### 3. 使用vuex
+
+`src/store/index.js`
+
+```javascript
+import { createStore } from 'vuex'
+
+// 创建一个新的 store 实例
+const store = createStore({
+  state () {
+    return {
+      // 用户信息
+      user : {}
+    }
+  },
+  mutations: {
+    // 记录用户信息
+    SET_USERINFO(state,user){
+      state.user = user
+    }
+  }
+})
+
+export default store
+```
+
+
+
+#### 4. 在mian.js注册vuex
+
+`main.js`
+
+```javascript
+import store from "./store"
+const app =createApp(App)
+
+app.use(store)
+```
+
+
+
+#### 5. 登录页调用vuex,并将用户信息存储到vuex
+
+`login.vue`
+
+```vue
+<script>
+  import {useStore} from "vuex"
+  const store = useStore()
+  
+  getInfo().then(response2 = > {
+    store.commit("SET_USERINFO", response2)
+  })
+</script>
+```
+
+
+
+#### 6. 在vue devTools中查看是否存储成功
+
+或者在`index.vue`页面输出`{{$store.state.user}}`
+
+### 7.12 全局路由拦截实现登录判断
+
+#### 1. 创建权限拦截文件
+
+`src/permission.js`
+
+
+
+#### 2. 利用路由全局前置守卫实现权限拦截
+
+`src/permission.js`
+
+```javascript
+import router from "~/router"
+import {getToken} from "~/composables/auth.js"
+import {toast} from "~/composables/util"
+
+// 全局前置守卫
+router.beforeEach((to, from, next) => {
+  console.log("全局前置守卫")
+  
+  const token = getToken()
+  
+  // 没有登录,强制跳转回登录页
+  if(!token && to.path != "/login"){
+    toast("请先登录","error")
+    return next({path : "/login"})
+  }
+  
+  // 防止用户重复登录
+  if(token && to.path === "/login"){
+    return next({path : from.path ? from.path : '/'})
+  }
+  
+  next()
+})
+```
+
+
+
+#### 3. 在main.js引入权限文件
+
+`main.js`
+
+```javascript
+import "./permission.js"
+app.mount("#app")
+```
+
+
+
+### 7.13 登录功能完善
+
+#### 存在的问题: 浏览器刷新vuex用户信息数据丢失问题
+
+
+
+#### 1. 将调用获取用户信息方法抽离到vuex中
+
+ `store/index.js`
+
+```javascript
+import {getinfo} from "~/api/manager.js"
+actions : {
+  // 获取当前登录的用户信息
+  getInfo({commit}){
+    return new Promise((resolve,reject)=>{
+        getinfo().then(response=>{
+          commit("SET_USERINFO", res)
+          resolve(res)
+   	 		}).catch(error=>reject(error))
+    })
+  }
+}
+```
+
+
+
+#### 2. 删除登录页面的获取用户信息方法
+
+
+
+#### 3. 在全局路由守卫中调用获取用户信息方法
+
+`src/permission.js`
+
+```javascript
+import router from "~/router"
+import {getToken} from "~/composables/auth.js"
+import {toast} from "~/composables/util"
+import store from "~/store"
+
+// 全局前置守卫
+router.beforeEach(async (to, from, next) => {
+  console.log("全局前置守卫")
+  
+  const token = getToken()
+  
+  // 没有登录,强制跳转回登录页
+  if(!token && to.path != "/login"){
+    toast("请先登录","error")
+    return next({path : "/login"})
+  }
+  
+  // 防止用户重复登录
+  if(token && to.path === "/login"){
+    return next({path : from.path ? from.path : '/'})
+  }
+  
+  // 如果用户登录了,则自动获取用户信息,并存储到vuex当中
+  if(token){
+     await store.dispatch("getInfo")
+  }
+  
+  next()
+})
+```
+
+
+
+#### 4. 抽离登录方法到vuex
+
+`store/index.js`
+
+```javascript
+import {login, getinfo} from "~/api/manager.js"
+import {setToken} from "~/composables/auth"
+actions : {
+  // 登录方法
+  login({commit},payload){
+    return new Promise((resolve,reject)=>{
+      login(payload).then(response=>{
+        setToken(response)
+        resolve(response)
+      }).catch(error=>reject(error))
+    })
+  },
+  
+  // 获取当前登录的用户信息
+  getInfo({commit}){
+    return new Promise((resolve,reject)=>{
+        getinfo().then(response=>{
+          commit("SET_USERINFO", res)
+          resolve(res)
+   	 		}).catch(error=>reject(error))
+    })
+  }
+}
+```
+
+
+
+#### 5. 删除登录页面登录相关的引入与方法
+
+
+
+#### 6. 在登录页面调用vuex内定义的登录方法
+
+`login.vue`
+
+```javascript
+<script>
+  
+import store from "~/store"
+  
+store.dispatch("login", form).then(response=>{
+  toast("登录成功")
+  
+  router.push("/")
+}).finally(()=>{
+  loading.value = false
+})
+</script>
+```
+
+
+
+#### 7. 实现点击回车按钮实现登录
+
+`login.vue`
+
+```javascript
+import {onMounted, onBeforeUnmount} from "vue"
+ 
+// 监听回车事件方法
+function onKeyUp(e){
+  console.log("e", e)
+  if(e.key === "Enter") onSubmit()
+}
+
+// 添加键盘监听
+onMounted(() => {
+  document.addEventListener("keyup", onKeyUp)
+})
+
+// 移除键盘监听
+onBeforeUnmount(() => {
+  document.removeEventListener("keyup",onKeyUp)
+})
+```
+
+
+
+### 7.14 退出登录功能实现
+
+#### 1. 实现退出登录功能
+
+`index.vue`
+
+```vue
+<template>
+	后台首页
+
+	{{$store.state.user.name}}
+
+	<el-button @click="handleLogout">退出登录</el-button>
+</template>
+
+<script setup>
+  funtion handleLogout(){
+    
+  }
+</script>  
+```
+
+
+
+#### 2. 使用element-plus的消息弹出框
+
+https://element-plus.gitee.io/zh-CN/component/message-box.html
+
+
+
+#### 3. 封装消息弹出框
+
+`composables/util.js`
+
+```javascript
+import {ElMessageBox } from "element-plus"
+
+// 消息弹出框
+export function showModal(content = "提示内容", type = "warning", title = ""){
+  return ElMessageBox.confirm(
+    content,
+    title,
+    {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type,
+    }
+  )
+}
+```
+
+
+
+#### 4. 实现退出登录功能2
+
+`index.vue`
+
+```vue
+<template>
+	后台首页
+
+	{{$store.state.user.name}}
+
+	<el-button @click="handleLogout">退出登录</el-button>
+</template>
+
+<script setup>
+  import {showModal} from "~/composables/util"
+  funtion handleLogout(){
+    showModal("是否要退出登录?").then(response=>{
+      console.log("是否要退出登录?")
+    })
+  }
+</script>  
+```
+
+
+
+#### 5. 封装退出登录接口
+
+`api/manager.js`
+
+```javascript
+// 退出登录接口
+export function logout(){
+  return axios.post("/admin/logout")
+}
+```
+
+
+
+#### 6. 实现退出登录3
+
+`index.vue`
+
+```vue
+<template>
+	后台首页
+
+	{{$store.state.user.name}}
+
+	<el-button @click="handleLogout">退出登录</el-button>
+</template>
+
+<script setup>
+  import {logout} from "~/api/manager.js"
+  import {showModal, toast} from "~/composables/util"
+  import {useRouter} from "vue-router"
+  const router = useRouter()
+  funtion handleLogout(){
+    showModal("是否要退出登录?").then(response=>{
+     	logout().then().finally(()=>{
+        // 移除cookie里的token
+        
+        // 清除vuex的用户信息
+        
+        // 跳转回登录页
+        router.push("/login")
+        // 提示退出登录
+        toast("退出登录成功")
+      })
+    })
+  }
+</script>  
+```
+
+
+
+#### 7. 在vuex中定义退出登录方法
+
+`store/index.js`
+
+```javascript
+import {removeToken} from "~/composables/auth"
+actions : {
+  // 退出登录
+  logout({commit}){
+    // 移除cookie里的token
+      removeToken()  
+    // 清除vuex的用户信息
+    commit("SET_USERINFO",{})
+  }
+}
+```
+
+
+
+#### 8. 实现退出登录4
+
+`index.vue`
+
+```vue
+<template>
+	后台首页
+
+	{{$store.state.user.name}}
+
+	<el-button @click="handleLogout">退出登录</el-button>
+</template>
+
+<script setup>
+  import {logout} from "~/api/manager.js"
+  import {showModal, toast} from "~/composables/util"
+  import {useRouter} from "vue-router"
+	import {useStore} from "vuex"
+  const router = useRouter()
+  const store = useStore()
+  funtion handleLogout(){
+    showModal("是否要退出登录?").then(response=>{
+     	logout().then().finally(()=>{
+        // 移除cookie里的token
+        // 清除vuex的用户信息
+        store.dispatch("logout")
+        
+        // 跳转回登录页
+        router.push("/login")
+        // 提示退出登录
+        toast("退出登录成功")
+      })
+    })
+  }
+</script>  
+```
+
+
+
+### 7.15 全局loading进度条实现
+
+#### 1. 演示loading进度条效果
+
+
+
+#### 2. 访问npm官网, 搜索进度条插件
+
+https://www.npmjs.com/search?q=nprogress
+
+
+
+#### 3.安装进度条插件
+
+`npm install --save nprogress`
+
+
+
+#### 4. 在main.js引入nprogress
+
+`main.js`
+
+```javascript
+import "nprogress/nprogress.css"
+```
+
+
+
+#### 5. 在utils.js封装nprogress
+
+`composables/util.js`
+
+```javascript
+import nprogress from "nprogress"
+
+// 显示全屏loading
+export showFullLoading(){
+  nprogress.start()
+}
+
+// 隐藏全屏loading
+export hideFullLoading(){
+  nprogress.done()
+}
+```
+
+
+
+#### 6. 在全局前置守卫开启进度条
+
+`src/permission.js`
+
+```javascript
+import router from "~/router"
+import {getToken} from "~/composables/auth.js"
+import {toast, showFullLoading , hideFullLoading} from "~/composables/util"
+
+// 全局前置守卫
+router.beforeEach((to, from, next) => {
+  console.log("全局前置守卫")
+  // 显示loading
+  showFullLoading()
+  
+  const token = getToken()
+  
+  // 没有登录,强制跳转回登录页
+  if(!token && to.path != "/login"){
+    toast("请先登录","error")
+    return next({path : "/login"})
+  }
+  
+  // 防止用户重复登录
+  if(token && to.path === "/login"){
+    return next({path : from.path ? from.path : '/'})
+  }
+  
+  next()
+})
+```
+
+
+
+#### 7. 修改进度条颜色
+
+`App.vue`
+
+```vue
+<style>
+  #nprogress .bar{
+    background-color : #f4f4f4 !important;
+    height : 3px !important;
+  }
+</style>
+```
+
+
+
+#### 8. 在全局后置守卫关闭进度条
+
+`src/permission.js`
+
+```javascript
+import router from "~/router"
+import {getToken} from "~/composables/auth.js"
+import {toast, showFullLoading , hideFullLoading} from "~/composables/util"
+
+// 全局前置守卫
+router.beforeEach((to, from, next) => {
+  console.log("全局前置守卫")
+  // 显示loading
+  showFullLoading()
+  
+  const token = getToken()
+  
+  // 没有登录,强制跳转回登录页
+  if(!token && to.path != "/login"){
+    toast("请先登录","error")
+    return next({path : "/login"})
+  }
+  
+  // 防止用户重复登录
+  if(token && to.path === "/login"){
+    return next({path : from.path ? from.path : '/'})
+  }
+  
+  next()
+})
+
+// 全局后置守卫
+router.afterEach((to, from) => hideFullLoading())
+```
+
+
+
+### 7.16 动态页面标题实现
+
+#### 7.16.1 演示动态页面标题效果
+
+
+
+#### 7.16.2 在router/index.js给不同的路由页面配置不同的标题
+
+`router/index.js`
+
+```javascript
+meta : {
+	title : '后台首页'
+}
+
+meta : {
+	title : '登录页'
+}
+```
+
+
+
+#### 7.16.3 在全局前置路由守卫设置页面标题
+
+`src/permission.js`
+
+```javascript
+import router from "~/router"
+import {getToken} from "~/composables/auth.js"
+import {toast, showFullLoading , hideFullLoading} from "~/composables/util"
+
+// 全局前置守卫
+router.beforeEach((to, from, next) => {
+  console.log("全局前置守卫")
+  // 显示loading
+  showFullLoading()
+  
+  const token = getToken()
+  
+  // 没有登录,强制跳转回登录页
+  if(!token && to.path != "/login"){
+    toast("请先登录","error")
+    return next({path : "/login"})
+  }
+  
+  // 防止用户重复登录
+  if(token && to.path === "/login"){
+    return next({path : from.path ? from.path : '/'})
+  }
+  
+  // 设置页面标题
+  let title = (to.meta.title ? to.meta.title : "") + "-九月云编程"
+  document.title = title
+  
+  
+  
+  next()
+})
+
+// 全局后置守卫
+router.afterEach((to, from) => hideFullLoading())
 ```
 

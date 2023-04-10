@@ -4,7 +4,6 @@ const AutoImport = require('unplugin-auto-import/webpack')
 const Components = require('unplugin-vue-components/webpack')
 const { ElementPlusResolver } = require('unplugin-vue-components/resolvers')
 
-const path = require('path')
 module.exports = defineConfig({
   transpileDependencies: true,
   // 方式一: 使用vue-cli的选项来进行配置
