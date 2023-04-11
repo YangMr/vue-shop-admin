@@ -3,6 +3,9 @@ import router from './router'
 import store from './store'
 import App from './App.vue'
 import 'windi.css'
+import 'normalize.css'
+
+// import './style/index.scss'
 
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 

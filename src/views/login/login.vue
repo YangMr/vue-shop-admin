@@ -33,6 +33,7 @@
             type="password"
             v-model.trim="form.password"
             placeholder="请输入密码"
+            show-password
           >
             <template #prefix>
               <el-icon><Lock /></el-icon>
@@ -40,7 +41,11 @@
           </el-input>
         </el-form-item>
         <el-form-item>
-          <el-button round class="w-[250px]" type="primary" @click="onSubmit"
+          <el-button
+            round
+            class="w-[250px]"
+            type="primary"
+            @click="onSubmit(ruleLoginFormRef)"
             >登录</el-button
           >
         </el-form-item>
@@ -52,8 +57,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import { login } from '@/api/user'
 
-const ruleLoginFormRef = ref<FormInstance>(null)
+const ruleLoginFormRef = ref<FormInstance>()
 
 const form = reactive({
   username: '',
@@ -65,9 +71,14 @@ const rules = reactive<FormRules>({
   password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
 })
 
-const onSubmit = () => {
-  ruleLoginFormRef.value.validate((valid) => {
-    console.log('valid=>', valid)
+const onSubmit = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  // 第一种 推荐
+  formEl.validate(async (valid) => {
+    if (!valid) return
+
+    const response = await login(form)
+    console.log('response=>', response)
   })
 }
 </script>

@@ -43,7 +43,17 @@ module.exports = defineConfig({
     // 是否自动打开浏览器并运行
     open: true,
     // 设置主机名
-    host: 'localhost'
+    host: 'localhost',
+    proxy: {
+      // 跨域配置 --- 多个配置跨域代理
+      [process.env.VUE_APP_BASE_API]: {
+        target: process.env.VUE_APP_SERVICE_URL,
+        changeOrigin: true,
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+    }
   },
   // 关闭eslint
   lintOnSave: false
