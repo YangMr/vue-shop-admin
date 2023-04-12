@@ -13,3 +13,11 @@ export const login = (data: typeLogin) => {
     data
   })
 }
+
+// 获取用户信息接口
+export const getUserInfo = () => {
+  return instance({
+    url: '/getinfo',
+    method: 'POST'
+  })
+}

@@ -2,10 +2,10 @@ import { createApp } from 'vue'
 import router from './router'
 import store from './store'
 import App from './App.vue'
+// import 'normalize.css'
 import 'windi.css'
-import 'normalize.css'
 
-// import './style/index.scss'
+import './style/index.scss'
 
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 

@@ -45,6 +45,7 @@
             round
             class="w-[250px]"
             type="primary"
+            :loading="loadingInstance"
             @click="onSubmit(ruleLoginFormRef)"
             >登录</el-button
           >
@@ -57,9 +58,13 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { login } from '@/api/user'
-
+import { login, getUserInfo } from '@/api/user'
+import { setToken } from '@/composables/auth'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+import { toast } from '@/composables/utils'
 const ruleLoginFormRef = ref<FormInstance>()
+const loadingInstance = ref(false)
 
 const form = reactive({
   username: '',
@@ -76,9 +81,28 @@ const onSubmit = (formEl: FormInstance | undefined) => {
   // 第一种 推荐
   formEl.validate(async (valid) => {
     if (!valid) return
+    loadingInstance.value = true
 
-    const response = await login(form)
-    console.log('response=>', response)
+    try {
+      // 调用登录接口
+      let response = await login(form)
+      console.log('response=>', response)
+
+      // 将token存储到本地
+      setToken(response.token)
+
+      // 调用获取用户信息接口
+      const userInfo = await getUserInfo()
+      console.log('userInfo=>', userInfo)
+
+      toast('登录成功')
+
+      router.push('/')
+    } catch (error) {
+      console.log('error', error)
+    } finally {
+      loadingInstance.value = false
+    }
   })
 }
 </script>
