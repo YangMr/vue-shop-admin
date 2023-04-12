@@ -58,11 +58,12 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { login, getUserInfo } from '@/api/user'
+import { login, getUserInfo } from '@/api/test'
 import { setToken } from '@/composables/auth'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 import { toast } from '@/composables/utils'
+
 const ruleLoginFormRef = ref<FormInstance>()
 const loadingInstance = ref(false)
 
@@ -96,6 +97,11 @@ const onSubmit = (formEl: FormInstance | undefined) => {
       console.log('userInfo=>', userInfo)
 
       toast('登录成功')
+
+      ElNotification({
+        title: '提示',
+        type: 'success'
+      })
 
       router.push('/')
     } catch (error) {

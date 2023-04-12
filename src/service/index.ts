@@ -52,3 +52,16 @@
 // })
 
 // export { ylRequest1, ylRequest2 }
+
+//
+// 1. 多个baseURL , 如何让不同的请求加载不同的baseURL
+// 2.
+
+import YLHttpRequest from './request/request'
+
+const YlRequest = new YLHttpRequest({
+  baseURL: '/api',
+  timeout: 1000
+})
+
+export { YlRequest }
