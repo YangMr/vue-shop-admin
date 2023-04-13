@@ -102,11 +102,6 @@ const onSubmit = () => {
 
       toast('登录成功')
 
-      ElNotification({
-        title: '提示',
-        type: 'success'
-      })
-
       router.push('/')
     } catch (error) {
       console.log('error', error)

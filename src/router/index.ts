@@ -5,10 +5,16 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('@/views/index.vue'),
-    meta: {
-      title: '后台首页'
-    }
+    component: () => import('@/layouts/admin.vue'),
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/index.vue'),
+        meta: {
+          title: '后台首页'
+        }
+      }
+    ]
   },
   {
     path: '/login',

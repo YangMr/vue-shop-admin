@@ -3181,3 +3181,1823 @@ router.beforeEach((to, from, next) => {
 router.afterEach((to, from) => hideFullLoading())
 ```
 
+
+
+## 八、后台主页布局开发
+
+### 8.1 后台布局结构实现
+
+#### 1. 演示主布局效果
+
+
+
+#### 2. 使用element-plus的container组件实现主页布局
+
+https://element-plus.gitee.io/zh-CN/component/container.html
+
+#### 3. 创建对应主布局组件以及进行主页布局结构划分
+
+`src/layout/admin.vue`
+
+```vue
+<template>
+	<el-container>
+    <el-header>头部</el-header>	
+    <el-container>
+  		<el-aside>侧边栏</el-aside>
+      <el-main>
+  			标签导航栏
+        <!--主要(组件)内容-->
+        <router-view></router-view>	
+  		</el-main>
+  	</el-container>
+  </el-container>  
+</template>
+```
+
+
+
+#### 4. 创建对应布局组件
+
+`src/layout/components/FHeader.vue`
+
+```vue
+<template>
+		头部
+</template>
+```
+
+`src/layout/components/FMenu.vue`
+
+```vue
+<template>
+	侧边导航
+</template>
+```
+
+`src/layout/componentsFTagList.vue`
+
+```vue
+<template>
+	标签导航栏
+</template>
+```
+
+
+
+#### 5. 在admin.vue组件内引入头部、侧边、标签等组件
+
+`src/layout/admin.vue`
+
+```vue
+<template>
+	<el-container>
+    <el-header>
+  		<f-header />
+  	</el-header>	
+    <el-container>
+  		<el-aside>
+  			<f-menu />
+  		</el-aside>
+      <el-main>
+  			<f-tag-list />
+        <!--主要(组件)内容-->
+        <router-view></router-view>	
+  		</el-main>
+  	</el-container>
+  </el-container>  
+</template>
+
+<script setup>
+import FHeader from "./components/FHeader.vue"
+import FMain from "./components/FMain.vue"
+import FTagList from "./components/FTagList.vue"
+  
+  
+</script>
+```
+
+
+
+#### 6. 配置主页路由布局
+
+`router/index.js`
+
+```javascript
+import Admin from "~/layout/admin.vue"
+
+const routes = [
+  {
+    path : "/",
+    component : Admin,
+    children : [
+      {
+        path : '/',
+        component : Index,
+        meta : {
+          title : '后台首页'
+        }
+      }
+    ]
+  }
+]
+```
+
+
+
+### 8.2 公共头部开发-样式布局
+
+#### 1. 实现header头部结构
+
+`FHeader.vue`
+
+```vue
+<template>
+	<div class="f-header">
+    <span>
+      <el-icon><eleme-filled /></el-icon>
+  		九月云编程
+  	</span>
+    <el-icon><fold /></el-icon>
+    <el-icon><refresh /></el-icon>
+    
+    <div>
+  		<el-icon><FullScreen /></el-icon>
+      <el-dropdown>
+        <span class="flex items-center text-light-50">
+          <el-avatar class="mr-2" :size="50" :src="$store.state.user.avatar" />
+          {{$store.state.user.username}}
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item>修改密码</el-dropdown-item>
+            <el-dropdown-item>退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+  	</div>
+  </div>
+</template>
+```
+
+
+
+#### 2. 实现header头部布局
+
+`FHeader.vue`
+
+```vue
+<template>
+	<div>
+    <span class="logo">
+      <el-icon class="mr-1"><eleme-filled /></el-icon>
+  		九月云编程
+  	</span>
+    <el-icon class="icon-btn"><fold /></el-icon>
+    <el-icon class="icon-btn"><refresh /></el-icon>
+    
+    <div class="ml-auto flex items-center">
+  		<el-icon class="icon-btn"><FullScreen /></el-icon>
+      <el-dropdown class="dropdown">
+        <span class="el-dropdown-link">
+          <el-avatar :size="50" :src="$store.state.user.avatar" />
+          {{$store.state.user.username}}
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item>修改密码</el-dropdown-item>
+            <el-dropdown-item>退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+  	</div>
+  </div>
+</template>
+
+<style scoped>
+  .f-header{
+    @apply flex items-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0;
+    height : 64px;
+  }
+  
+  .logo{
+    width : 250px;
+    @apply flex justify-center items-center text-xl font-thin;
+  }
+  
+  .icon-btn{
+    @apply flex justify-center items-center;
+    width : 42px;
+    height : 64px;
+    cursor : pointer;
+  }
+  
+  .icon-btn:hover{
+    @apply bg-indigo-600;
+  }
+  
+  .dropdown{
+    height : 64px;
+    cursor : pointer;
+    @apply flex justify-center items-center mx-5;
+  }
+</style>  
+```
+
+
+
+### 8.3 公共头部开发 - 刷新与全屏
+
+#### 1. 将index.vue退出登录的代码移入到header.vue组件
+
+
+
+#### 2. 点击下拉菜单的退出登录,能够实现退出登录
+
+`FHeader.vue`
+
+```vue
+<template>
+	<div>
+    <span class="logo">
+      <el-icon class="mr-1"><eleme-filled /></el-icon>
+  		九月云编程
+  	</span>
+    <el-icon class="icon-btn"><fold /></el-icon>
+    <el-icon class="icon-btn"><refresh /></el-icon>
+    
+    <div class="ml-auto flex items-center">
+  		<el-icon class="icon-btn"><FullScreen /></el-icon>
+      <el-dropdown class="dropdown" @command="handleCommand">
+        <span class="el-dropdown-link">
+          <el-avatar :size="50" :src="$store.state.user.avatar" />
+          {{$store.state.user.username}}
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="rePassword">修改密码</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+  	</div>
+  </div>
+</template>
+
+<script setup>
+  const handleCommand = (command) => {
+    switch(command){
+      case "logout" : 
+        handleLogout()
+        break;
+      case "rePassword" :
+        console.log("修改密码")
+        break;
+        
+    }
+  }
+</script>  
+
+<style scoped>
+  .f-header{
+    @apply flex items-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0;
+    height : 64px;
+  }
+  
+  .logo{
+    width : 250px;
+    @apply flex justify-center items-center text-xl font-thin;
+  }
+  
+  .icon-btn{
+    @apply flex justify-center items-center;
+    width : 42px;
+    height : 64px;
+    cursor : pointer;
+  }
+  
+  .icon-btn:hover{
+    @apply bg-indigo-600;
+  }
+  
+  .dropdown{
+    height : 64px;
+    cursor : pointer;
+    @apply flex justify-center items-center mx-5;
+  }
+</style>  
+```
+
+
+
+#### 3. 演示鼠标移入图标下面显示文字效果
+
+
+
+#### 4. 实现标移入图标下面显示文字效果
+
+https://element-plus.gitee.io/zh-CN/component/tooltip.html
+
+`FHeader.vue`
+
+```vue
+<template>
+	<div>
+    <span class="logo">
+      <el-icon class="mr-1"><eleme-filled /></el-icon>
+  		九月云编程
+  	</span>
+    <el-tooltip
+        effect="dark"
+        content="菜单"
+        placement="bottom"
+      >
+        <el-icon class="icon-btn"><fold /></el-icon>
+      </el-tooltip>
+    
+    <el-tooltip
+        effect="dark"
+        content="刷新"
+        placement="bottom"
+      >
+        <el-icon class="icon-btn"><refresh /></el-icon>
+      </el-tooltip>
+    
+    
+    
+    <div class="ml-auto flex items-center">
+       <el-tooltip
+        effect="dark"
+        content="全屏"
+        placement="bottom"
+      >
+       <el-icon class="icon-btn"><FullScreen /></el-icon>
+      </el-tooltip>
+  		
+      <el-dropdown class="dropdown" @command="handleCommand">
+        <span class="el-dropdown-link">
+          <el-avatar :size="50" :src="$store.state.user.avatar" />
+          {{$store.state.user.username}}
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="rePassword">修改密码</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+  	</div>
+  </div>
+</template>
+
+<script setup>
+  const handleCommand = (command) => {
+    switch(command){
+      case "logout" : 
+        handleLogout()
+        break;
+      case "rePassword" :
+        console.log("修改密码")
+        break;
+        
+    }
+  }
+</script>  
+
+<style scoped>
+  .f-header{
+    @apply flex items-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0;
+    height : 64px;
+  }
+  
+  .logo{
+    width : 250px;
+    @apply flex justify-center items-center text-xl font-thin;
+  }
+  
+  .icon-btn{
+    @apply flex justify-center items-center;
+    width : 42px;
+    height : 64px;
+    cursor : pointer;
+  }
+  
+  .icon-btn:hover{
+    @apply bg-indigo-600;
+  }
+  
+  .dropdown{
+    height : 64px;
+    cursor : pointer;
+    @apply flex justify-center items-center mx-5;
+  }
+</style>  
+```
+
+
+
+#### 5. 实现刷新功能
+
+`FHeader.vue`
+
+```vue
+<template>
+	<div>
+    <span class="logo">
+      <el-icon class="mr-1"><eleme-filled /></el-icon>
+  		九月云编程
+  	</span>
+    <el-tooltip
+        effect="dark"
+        content="菜单"
+        placement="bottom"
+      >
+        <el-icon class="icon-btn"><fold /></el-icon>
+      </el-tooltip>
+    
+    <el-tooltip
+        effect="dark"
+        content="刷新"
+        placement="bottom"
+      >
+        <el-icon class="icon-btn" @click="handleRefresh"><refresh /></el-icon>
+      </el-tooltip>
+    
+    
+    
+    <div class="ml-auto flex items-center">
+       <el-tooltip
+        effect="dark"
+        content="全屏"
+        placement="bottom"
+      >
+       <el-icon class="icon-btn"><FullScreen /></el-icon>
+      </el-tooltip>
+  		
+      <el-dropdown class="dropdown" @command="handleCommand">
+        <span class="el-dropdown-link">
+          <el-avatar :size="50" :src="$store.state.user.avatar" />
+          {{$store.state.user.username}}
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="rePassword">修改密码</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+  	</div>
+  </div>
+</template>
+
+<script setup>
+  // 下拉菜单
+  const handleCommand = (command) => {
+    switch(command){
+      case "logout" : 
+        handleLogout()
+        break;
+      case "rePassword" :
+        console.log("修改密码")
+        break;
+    }
+  }
+  
+  // 刷新
+  const handleRefresh = ()=> {
+   location.reload()
+  }
+</script>  
+
+<style scoped>
+  .f-header{
+    @apply flex items-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0;
+    height : 64px;
+  }
+  
+  .logo{
+    width : 250px;
+    @apply flex justify-center items-center text-xl font-thin;
+  }
+  
+  .icon-btn{
+    @apply flex justify-center items-center;
+    width : 42px;
+    height : 64px;
+    cursor : pointer;
+  }
+  
+  .icon-btn:hover{
+    @apply bg-indigo-600;
+  }
+  
+  .dropdown{
+    height : 64px;
+    cursor : pointer;
+    @apply flex justify-center items-center mx-5;
+  }
+</style>  
+```
+
+
+
+#### 6. 实现全屏功能
+
+在VueUse中搜索fullScreen插件, https://vueuse.org/core/usefullscreen/#usefullscreen
+
+
+
+安装`npm i @vueuse/core ` 核心包
+
+https://vueuse.org/guide/
+
+```
+npm i @vueuse/core
+```
+
+
+
+使用`usefullscreen`
+
+https://vueuse.org/core/usefullscreen/#usefullscreen
+
+```javascript
+import { useFullscreen } from '@vueuse/core'
+// isFullscreen是否全屏  enter 进入全屏 exit 退出全屏 toggle 切换全屏
+const { isFullscreen, enter, exit, toggle } = useFullscreen()
+```
+
+
+
+`FHeader.vue`
+
+```vue
+<template>
+	<div>
+    <span class="logo">
+      <el-icon class="mr-1"><eleme-filled /></el-icon>
+  		九月云编程
+  	</span>
+    <el-tooltip
+        effect="dark"
+        content="菜单"
+        placement="bottom"
+      >
+        <el-icon class="icon-btn"><fold /></el-icon>
+      </el-tooltip>
+    
+    <el-tooltip
+        effect="dark"
+        content="刷新"
+        placement="bottom"
+      >
+        <el-icon class="icon-btn" @click="handleRefresh"><refresh /></el-icon>
+      </el-tooltip>
+    
+    
+    
+    <div class="ml-auto flex items-center">
+       <el-tooltip
+        effect="dark"
+        content="全屏"
+        placement="bottom"
+      >
+       <el-icon class="icon-btn" @click="toggle">
+         <FullScreen v-if="!isFullscreen" />
+         <Aim v-else/>
+  		 </el-icon>
+         
+      </el-tooltip>
+  		
+      <el-dropdown class="dropdown" @command="handleCommand">
+        <span class="el-dropdown-link">
+          <el-avatar :size="50" :src="$store.state.user.avatar" />
+          {{$store.state.user.username}}
+          <el-icon class="el-icon--right">
+            <arrow-down />
+          </el-icon>
+        </span>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="rePassword">修改密码</el-dropdown-item>
+            <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+  	</div>
+  </div>
+</template>
+
+<script setup>
+  // 引入useFullscreen相关模块 
+  import { useFullscreen } from '@vueuse/core'
+	const { isFullscreen, toggle } = useFullscreen()
+  
+  
+  
+  // 下拉菜单
+  const handleCommand = (command) => {
+    switch(command){
+      case "logout" : 
+        handleLogout()
+        break;
+      case "rePassword" :
+        console.log("修改密码")
+        break;
+    }
+  }
+  
+  // 刷新
+  const handleRefresh = ()=> {
+   location.reload()
+  }
+</script>  
+
+<style scoped>
+  .f-header{
+    @apply flex items-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0;
+    height : 64px;
+  }
+  
+  .logo{
+    width : 250px;
+    @apply flex justify-center items-center text-xl font-thin;
+  }
+  
+  .icon-btn{
+    @apply flex justify-center items-center;
+    width : 42px;
+    height : 64px;
+    cursor : pointer;
+  }
+  
+  .icon-btn:hover{
+    @apply bg-indigo-600;
+  }
+  
+  .dropdown{
+    height : 64px;
+    cursor : pointer;
+    @apply flex justify-center items-center mx-5;
+  }
+</style>  
+```
+
+
+
+### 8.4 实现修改密码功能
+
+#### 1. 演示修改密码效果
+
+
+
+#### 2. 实现修改密码接口封装
+
+`api/manager.js`
+
+```javascript
+export function updatepassword(data = {}){
+	return axios.post({url : '/admin/updatepassword', method : 'POST', data})
+}
+```
+
+
+
+#### 3. 实现element-plus抽屉组件实现修改密码抽屉效果
+
+`FHeader.vue`
+
+```vue
+<el-drawer v-model="showDrawer" title="I am the title" >
+    <span>Hi there!</span>
+</el-drawer>
+
+<script setup>
+import { ref } from 'vue'
+// 修改密码抽屉状态 
+const showDrawer = ref(false)
+</script>  
+```
+
+
+
+#### 4. 设置抽屉宽度
+
+`FHeader.vue`
+
+```vue
+<el-drawer v-model="showDrawer" title="修改密码" size="45%" >
+    <span>Hi there!</span>
+</el-drawer>
+
+<script setup>
+import { ref } from 'vue'
+// 修改密码抽屉状态 
+const showDrawer = ref(false)
+</script>  
+```
+
+
+
+#### 5. 设置不可以通过点击 modal 关闭 Drawer
+
+`FHeader.vue`
+
+```vue
+<el-drawer v-model="showDrawer" title="修改密码" size="45%" :close-on-click-modal="false">
+    <span>Hi there!</span>
+</el-drawer>
+
+<script setup>
+import { ref } from 'vue'
+// 修改密码抽屉状态 
+const showDrawer = ref(false)
+</script>  
+```
+
+
+
+#### 6. 设置点击修改密码弹出抽屉
+
+`FHeader.vue`
+
+```vue
+<el-drawer v-model="showDrawer" title="修改密码" size="45%" :close-on-click-modal="false">
+    <span>Hi there!</span>
+</el-drawer>
+
+<script setup>
+import { ref } from 'vue'
+// 修改密码抽屉状态 
+const showDrawer = ref(false)
+
+case "rePassword" :
+  showDrawer.value = true
+  break;
+</script>  
+```
+
+
+
+#### 7. 复制登录页面表单到抽屉的代码里面
+
+`FHeader.vue`
+
+```vue
+<el-drawer v-model="showDrawer" title="修改密码" size="45%" :close-on-click-modal="false">
+        <el-form ref="formRef" :rules="rules" :model="form" label-width="80px" size="small">
+            <el-form-item prop="oldpassword" label="旧密码">
+                <el-input v-model="form.oldpassword" placeholder="请输入旧密码"></el-input>
+            </el-form-item>
+            <el-form-item prop="password" label="新密码">
+                <el-input type="password" v-model="form.password" placeholder="请输入密码" show-password></el-input>
+            </el-form-item>
+            <el-form-item prop="repassword" label="确认密码">
+                <el-input type="password" v-model="form.repassword" placeholder="请输入确认密码" show-password></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit" :loading="loading">提交</el-button>
+            </el-form-item>
+        </el-form>
+    </el-drawer>
+```
+
+#### 8. 实现修改密码功能
+
+`FHeader.vue`
+
+```vue
+<template>
+    <div class="f-header">
+        <span class="logo">
+            <el-icon class="mr-1">
+                <eleme-filled />
+            </el-icon>
+            帝莎编程
+        </span>
+        <el-icon class="icon-btn">
+            <fold />
+        </el-icon>
+        <el-tooltip effect="dark" content="刷新" placement="bottom">
+            <el-icon class="icon-btn" @click="handleRefresh">
+                <refresh />
+            </el-icon>
+        </el-tooltip>
+
+        <div class="ml-auto flex items-center">
+            <el-tooltip effect="dark" content="全屏" placement="bottom">
+                <el-icon class="icon-btn" @click="toggle">
+                    <full-screen v-if="!isFullscreen" />
+                    <aim v-else />
+                </el-icon>
+            </el-tooltip>
+
+            <el-dropdown class="dropdown" @command="handleCommand">
+                <span class="flex items-center text-light-50">
+                    <el-avatar class="mr-2" :size="25" :src="$store.state.user.avatar" />
+                    {{ $store.state.user.username }}
+                    <el-icon class="el-icon--right">
+                        <arrow-down />
+                    </el-icon>
+                </span>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item command="rePassword">修改密码</el-dropdown-item>
+                        <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+        </div>
+    </div>
+
+    <el-drawer v-model="showDrawer" title="修改密码" size="45%" :close-on-click-modal="false">
+        <el-form ref="formRef" :rules="rules" :model="form" label-width="80px" size="small">
+            <el-form-item prop="oldpassword" label="旧密码">
+                <el-input v-model="form.oldpassword" placeholder="请输入旧密码"></el-input>
+            </el-form-item>
+            <el-form-item prop="password" label="新密码">
+                <el-input type="password" v-model="form.password" placeholder="请输入密码" show-password></el-input>
+            </el-form-item>
+            <el-form-item prop="repassword" label="确认密码">
+                <el-input type="password" v-model="form.repassword" placeholder="请输入确认密码" show-password></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit" :loading="loading">提交</el-button>
+            </el-form-item>
+        </el-form>
+    </el-drawer>
+
+</template>
+<script setup>
+import { ref, reactive } from 'vue'
+import { logout,updatepassword } from "~/api/manager"
+import { showModal, toast } from "~/composables/util"
+import { useRouter } from "vue-router"
+import { useStore } from "vuex"
+import { useFullscreen } from '@vueuse/core'
+const {
+    // 是否全屏状态
+    isFullscreen,
+    // 切换全屏
+    toggle
+} = useFullscreen()
+
+const router = useRouter()
+const store = useStore()
+
+// 修改密码
+const showDrawer = ref(false)
+// do not use same name with ref
+const form = reactive({
+    oldpassword:"",
+    password: "",
+    repassword:""
+})
+
+const rules = {
+    oldpassword: [
+        {
+            required: true,
+            message: '旧密码不能为空',
+            trigger: 'blur'
+        },
+    ],
+    password: [
+        {
+            required: true,
+            message: '新密码不能为空',
+            trigger: 'blur'
+        },
+    ],
+    repassword: [
+        {
+            required: true,
+            message: '确认密码不能为空',
+            trigger: 'blur'
+        },
+    ]
+}
+
+const formRef = ref(null)
+const loading = ref(false)
+const onSubmit = () => {
+    formRef.value.validate((valid) => {
+        if (!valid) {
+            return false
+        }
+        loading.value = true
+        updatepassword(form)
+        .then(res=>{
+            toast("修改密码成功，请重新登录")
+            store.dispatch("logout")
+            // 跳转回登录页
+            router.push("/login")
+        })
+        .finally(()=>{
+            loading.value = false
+        })
+
+    })
+}
+
+
+const handleCommand = (c) => {
+    switch (c) {
+        case "logout":
+            handleLogout()
+            break;
+        case "rePassword":
+            showDrawer.value = true
+            break;
+    }
+}
+
+// 刷新
+const handleRefresh = () => location.reload()
+
+
+function handleLogout() {
+    showModal("是否要退出登录？").then(res => {
+        logout()
+            .finally(() => {
+
+                store.dispatch("logout")
+                // 跳转回登录页
+                router.push("/login")
+                // 提示退出登录成功
+                toast("退出登录成功")
+            })
+    })
+}
+</script>
+<style>
+.f-header {
+    @apply flex items-center bg-indigo-700 text-light-50 fixed top-0 left-0 right-0;
+    height: 64px;
+}
+
+.logo {
+    width: 250px;
+    @apply flex justify-center items-center text-xl font-thin;
+}
+
+.icon-btn {
+    @apply flex justify-center items-center;
+    width: 42px;
+    height: 64px;
+    cursor: pointer;
+}
+
+.icon-btn:hover {
+    @apply bg-indigo-600;
+}
+
+.f-header .dropdown {
+    height: 64px;
+    cursor: pointer;
+    @apply flex justify-center items-center mx-5;
+}
+</style>
+```
+
+
+
+#### 9. 在响应拦截器处理非法token问题
+
+```javascript
+import store from "./store"
+
+const msg = error.response.data.msg || "请求失败"
+
+if(msg === "非法token,请先登录"){
+   store.dispatch("logout").finally(()=>{
+     location.reload()
+   })
+}
+toast("msg", "error")
+```
+
+
+
+### 8.5 通用弹窗表单组件封装1
+
+#### 1. 演示为什么要封装弹窗表单组件
+
+
+
+#### 2. 创建弹窗表单组件
+
+`components/FormDrawer.vue`
+
+
+
+#### 3. 将上节课写的抽屉表单内容剪切到弹窗表单组件
+
+`components/FormDrawer.vue`
+
+```vue
+<template>
+	<el-drawer v-model="showDrawer" title="修改密码" size="45%" :close-on-click-modal="false">
+        <el-form ref="formRef" :rules="rules" :model="form" label-width="80px" size="small">
+            <el-form-item prop="oldpassword" label="旧密码">
+                <el-input v-model="form.oldpassword" placeholder="请输入旧密码"></el-input>
+            </el-form-item>
+            <el-form-item prop="password" label="新密码">
+                <el-input type="password" v-model="form.password" placeholder="请输入密码" show-password></el-input>
+            </el-form-item>
+            <el-form-item prop="repassword" label="确认密码">
+                <el-input type="password" v-model="form.repassword" placeholder="请输入确认密码" show-password></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="onSubmit" :loading="loading">提交</el-button>
+            </el-form-item>
+        </el-form>
+    </el-drawer>
+</template>
+```
+
+
+
+#### 4. 设置弹窗的打开与关闭方法
+
+`components/FormDrawer.vue`
+
+```vue
+<template>
+	<el-drawer v-model="showDrawer" title="修改密码" size="45%" :close-on-click-modal="false">
+    <div class="formDrawer"></div>
+  </el-drawer>
+</template>
+
+<script>
+  import {ref} from "vue"
+  const showDrawer = ref(false)
+  
+  // 打开
+  const open = () => {
+    showDrawer.value = true
+  }
+  
+  // 关闭
+  const close = () => {
+    showDrawer.value = false
+  }
+</script>  
+```
+
+
+
+#### 5. 将打开与关闭方法导出出去
+
+https://cn.vuejs.org/api/sfc-script-setup.html#defineexpose
+
+`components/FormDrawer.vue`
+
+```vue
+<template>
+	<el-drawer v-model="showDrawer" title="修改密码" size="45%" :close-on-click-modal="false">
+    <div class="formDrawer">
+      <slot></slot>
+  	</div>
+  </el-drawer>
+</template>
+
+<script>
+  import {ref} from "vue"
+  const showDrawer = ref(false)
+  
+  // 打开
+  const open = () => {
+    showDrawer.value = true
+  }
+  
+  // 关闭
+  const close = () => {
+    showDrawer.value = false
+  }
+  
+  // 向父组件暴露以下方法
+  defineExpose({
+    open,
+    close
+  })
+</script>  
+```
+
+
+
+#### 6. 在header组件使用封装的弹窗表单组件
+
+`FHeader.vue`
+
+```vue
+<template>
+    <div class="f-header">
+        <span class="logo">
+            <el-icon class="mr-1">
+                <eleme-filled />
+            </el-icon>
+            帝莎编程
+        </span>
+        <el-icon class="icon-btn">
+            <fold />
+        </el-icon>
+        <el-tooltip effect="dark" content="刷新" placement="bottom">
+            <el-icon class="icon-btn" @click="handleRefresh">
+                <refresh />
+            </el-icon>
+        </el-tooltip>
+
+        <div class="ml-auto flex items-center">
+            <el-tooltip effect="dark" content="全屏" placement="bottom">
+                <el-icon class="icon-btn" @click="toggle">
+                    <full-screen v-if="!isFullscreen" />
+                    <aim v-else />
+                </el-icon>
+            </el-tooltip>
+
+            <el-dropdown class="dropdown" @command="handleCommand">
+                <span class="flex items-center text-light-50">
+                    <el-avatar class="mr-2" :size="25" :src="$store.state.user.avatar" />
+                    {{ $store.state.user.username }}
+                    <el-icon class="el-icon--right">
+                        <arrow-down />
+                    </el-icon>
+                </span>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item command="rePassword">修改密码</el-dropdown-item>
+                        <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+        </div>
+    </div>
+
+    <form-drawer ref="formDrawerRef">
+			123
+		</form-drawer>
+
+</template>
+<script setup>
+
+import FormDrawer from "~/components/FormDrawer.vue"
+  
+// 修改密码
+const formDrawerRef = ref(null)
+
+const handleCommand = (c) => {
+    switch (c) {
+        case "logout":
+            handleLogout()
+            break;
+        case "rePassword":
+            showDrawer.value.open()
+            break;
+    }
+}
+
+</script>
+
+```
+
+
+
+#### 7. 实现弹窗表单底部按钮固定, 中间滚动
+
+`components/FormDrawer.vue`
+
+```vue
+<template>
+	<el-drawer v-model="showDrawer" title="修改密码" size="45%" :close-on-click-modal="false">
+    <div class="formDrawer">
+      <div class="body">
+        <slot></slot>
+  		</div>
+      <div class="actions">
+  			<el-button type="primary">提交</el-button>
+        <el-button type="default" @click="close">取消</el-button>
+  		</div>	
+  	</div>
+  </el-drawer>
+</template>
+
+<script>
+  import {ref} from "vue"
+  const showDrawer = ref(false)
+  
+  // 打开
+  const open = () => {
+    showDrawer.value = true
+  }
+  
+  // 关闭
+  const close = () => {
+    showDrawer.value = false
+  }
+  
+  // 向父组件暴露以下方法
+  defineExpose({
+    open,
+    close
+  })
+</script>  
+
+<style>
+  .formDrawer{
+    width : 100%;
+    height : 100%;
+    position : relative;
+    @apply bg-rose-400 flex flex-col;
+  }
+  
+  .formDrawer .body{
+    flex : 1;
+    position : absolute;
+    top : 0;
+    left : 0;
+    right : 0; 
+    bottom : 50px;
+    overflow-y : auto;
+  }
+  
+  .formDrawer .actions {
+    height : 50px;
+    @apply mt-auto flecx items-center;
+  }
+</style>  
+```
+
+
+
+#### 8. 测试中间部分是否可以滚动
+
+`FHeader.vue`
+
+```vue
+<form-drawer ref="formDrawerRef">
+	123
+  <div class="bg-rose-400" style="height : 1000px;"></div> 	
+</form-drawer>
+```
+
+
+
+### 8.6 通用弹框表单组件封装(2)
+
+#### 1.  通过组件通信动态设置弹框标题与宽度、按钮、组件销毁以及点击提交按钮将事件发送给父组件
+
+`FormDrawer.vue`
+
+```javascript
+<template>
+	<el-drawer v-model="showDrawer" :title="title" :size="size" :close-on-click-modal="false" :destroy-on-close="destoryOnClose">
+    <div class="formDrawer">
+      <div class="body">
+        <slot></slot>
+  		</div>
+      <div class="actions">
+  			<el-button :loading="loading" type="primary" @click="submit">{{confirmText}}</el-button>
+        <el-button type="default" @click="close">取消</el-button>
+  		</div>	
+  	</div>
+  </el-drawer>
+</template>
+
+<script setup>
+// 接收父组件传递的参数  
+const props = defineProps({
+	title : String,
+	size : {
+		type : String,
+		default : '45%'
+	},
+  destoryOnClose : {
+    type : Boolean,
+    default : false
+  },
+  confirmText : {
+    type : String,
+		default : '提交'
+  }
+})
+
+const loading = ref(false)
+
+// 显示loading
+const showLoading = () => {
+  loading.value = true
+}
+
+// 隐藏loading
+const hideLoading = () => {
+  loading.value = false
+}
+
+// 提交
+const emit = defineEmits(["submit"])
+const submit = () => {
+  emit("submit")
+}
+
+// 向父组件暴露以下方法
+defineExpose({
+  showLoading,
+  hideLoading
+})
+</script>
+```
+
+
+
+#### 2. 给弹框组件传值
+
+`FHeader.vue`
+
+```vue
+<template>
+	<form-drawer ref="formDrawerRef" title="修改密码" destoryOnClose @submit="onSubmit">
+  	<el-form ref="formRef" :rules="rules" :model="form" label-width="80px" size="small">
+            <el-form-item prop="oldpassword" label="旧密码">
+                <el-input v-model="form.oldpassword" placeholder="请输入旧密码"></el-input>
+            </el-form-item>
+            <el-form-item prop="password" label="新密码">
+                <el-input type="password" v-model="form.password" placeholder="请输入密码" show-password></el-input>
+            </el-form-item>
+            <el-form-item prop="repassword" label="确认密码">
+                <el-input type="password" v-model="form.repassword" placeholder="请输入确认密码" show-password></el-input>
+            </el-form-item>
+        </el-form>
+  </form-drawer>
+</template>
+
+
+```
+
+
+
+### 8.7 组合式api封装简化代码
+
+#### 1. 使用组合式API简化代码
+
+`FHeader.vue`
+
+```javascript
+function useRepassword() {
+    const router = useRouter()
+    const store = useStore()
+    // 修改密码
+    const formDrawerRef = ref(null)
+    const form = reactive({
+        oldpassword: "",
+        password: "",
+        repassword: ""
+    })
+
+    const rules = {
+        oldpassword: [
+            {
+                required: true,
+                message: '旧密码不能为空',
+                trigger: 'blur'
+            },
+        ],
+        password: [
+            {
+                required: true,
+                message: '新密码不能为空',
+                trigger: 'blur'
+            },
+        ],
+        repassword: [
+            {
+                required: true,
+                message: '确认密码不能为空',
+                trigger: 'blur'
+            },
+        ]
+    }
+
+    const formRef = ref(null)
+    const onSubmit = () => {
+        formRef.value.validate((valid) => {
+            if (!valid) {
+                return false
+            }
+            formDrawerRef.value.showLoading()
+            updatepassword(form)
+                .then(res => {
+                    toast("修改密码成功，请重新登录")
+                    store.dispatch("logout")
+                    // 跳转回登录页
+                    router.push("/login")
+                })
+                .finally(() => {
+                    formDrawerRef.value.hideLoading()
+                })
+
+        })
+    }
+
+    const openRePasswordForm = () => formDrawerRef.value.open()
+
+    return {
+        formDrawerRef,
+        form,
+        rules,
+        formRef,
+        onSubmit,
+        openRePasswordForm
+    }
+}
+```
+
+
+
+#### 2. 重新调用打开弹窗方法
+
+`Fheader.vue`
+
+```javascript
+const {
+    formDrawerRef,
+    form,
+    rules,
+    formRef,
+    onSubmit,
+    openRePasswordForm
+} = useRepassword()
+
+const handleCommand = (c) => {
+    switch (c) {
+        case "logout":
+            handleLogout()
+            break;
+        case "rePassword":
+            openRePasswordForm()
+            break;
+    }
+}
+```
+
+
+
+#### 3. 将抽离的代码封装到单独的模块
+
+`composables/useManager.js`
+
+```javascript
+import { ref, reactive } from 'vue'
+import { logout, updatepassword } from "~/api/manager"
+import { showModal, toast } from "~/composables/util"
+import { useRouter } from "vue-router"
+import { useStore } from "vuex"
+
+export function useRepassword() {
+    const router = useRouter()
+    const store = useStore()
+    // 修改密码
+    const formDrawerRef = ref(null)
+    const form = reactive({
+        oldpassword: "",
+        password: "",
+        repassword: ""
+    })
+
+    const rules = {
+        oldpassword: [
+            {
+                required: true,
+                message: '旧密码不能为空',
+                trigger: 'blur'
+            },
+        ],
+        password: [
+            {
+                required: true,
+                message: '新密码不能为空',
+                trigger: 'blur'
+            },
+        ],
+        repassword: [
+            {
+                required: true,
+                message: '确认密码不能为空',
+                trigger: 'blur'
+            },
+        ]
+    }
+
+    const formRef = ref(null)
+    const onSubmit = () => {
+        formRef.value.validate((valid) => {
+            if (!valid) {
+                return false
+            }
+            formDrawerRef.value.showLoading()
+            updatepassword(form)
+                .then(res => {
+                    toast("修改密码成功，请重新登录")
+                    store.dispatch("logout")
+                    // 跳转回登录页
+                    router.push("/login")
+                })
+                .finally(() => {
+                    formDrawerRef.value.hideLoading()
+                })
+
+        })
+    }
+
+    const openRePasswordForm = () => formDrawerRef.value.open()
+
+    return {
+        formDrawerRef,
+        form,
+        rules,
+        formRef,
+        onSubmit,
+        openRePasswordForm
+    }
+}
+```
+
+
+
+#### 4. 再次抽离退出登录方法
+
+`composables/useManager.js`
+
+```javascript
+import { ref, reactive } from 'vue'
+import { logout, updatepassword } from "~/api/manager"
+import { showModal, toast } from "~/composables/util"
+import { useRouter } from "vue-router"
+import { useStore } from "vuex"
+
+export function useRepassword() {
+    const router = useRouter()
+    const store = useStore()
+    // 修改密码
+    const formDrawerRef = ref(null)
+    const form = reactive({
+        oldpassword: "",
+        password: "",
+        repassword: ""
+    })
+
+    const rules = {
+        oldpassword: [
+            {
+                required: true,
+                message: '旧密码不能为空',
+                trigger: 'blur'
+            },
+        ],
+        password: [
+            {
+                required: true,
+                message: '新密码不能为空',
+                trigger: 'blur'
+            },
+        ],
+        repassword: [
+            {
+                required: true,
+                message: '确认密码不能为空',
+                trigger: 'blur'
+            },
+        ]
+    }
+
+    const formRef = ref(null)
+    const onSubmit = () => {
+        formRef.value.validate((valid) => {
+            if (!valid) {
+                return false
+            }
+            formDrawerRef.value.showLoading()
+            updatepassword(form)
+                .then(res => {
+                    toast("修改密码成功，请重新登录")
+                    store.dispatch("logout")
+                    // 跳转回登录页
+                    router.push("/login")
+                })
+                .finally(() => {
+                    formDrawerRef.value.hideLoading()
+                })
+
+        })
+    }
+
+    const openRePasswordForm = () => formDrawerRef.value.open()
+
+    return {
+        formDrawerRef,
+        form,
+        rules,
+        formRef,
+        onSubmit,
+        openRePasswordForm
+    }
+}
+
+export function useLogout() {
+    const router = useRouter()
+    const store = useStore()
+    function handleLogout() {
+        showModal("是否要退出登录？").then(res => {
+            logout().finally(() => {
+                store.dispatch("logout")
+                // 跳转回登录页
+                router.push("/login")
+                // 提示退出登录成功
+                toast("退出登录成功")
+            })
+        })
+    }
+
+    return {
+        handleLogout
+    }
+}
+```
+
+
+
+`Fheader.vue`
+
+```javascript
+mport FormDrawer from '~/components/FormDrawer.vue'
+import { useFullscreen } from '@vueuse/core'
+import { useRepassword,useLogout } from "~/composables/useManager"
+const {
+    // 是否全屏状态
+    isFullscreen,
+    // 切换全屏
+    toggle
+} = useFullscreen()
+
+const {
+    formDrawerRef,
+    form,
+    rules,
+    formRef,
+    onSubmit,
+    openRePasswordForm
+} = useRepassword()
+
+const {
+    handleLogout
+} = useLogout()
+
+const handleCommand = (c) => {
+    switch (c) {
+        case "logout":
+            handleLogout()
+            break;
+        case "rePassword":
+            openRePasswordForm()
+            break;
+    }
+}
+
+// 刷新
+const handleRefresh = () => location.reload()
+```
+
+
+
+### 8.8 展开和收起菜单功能实现
+
+#### 1. 在vuex定义侧边栏宽度以及修改侧边栏样式方法
+
+`store/index.js`
+
+```javascript
+state() {
+        return {
+            // 用户信息
+            user: {},
+
+            // 侧边宽度
+            asideWidth:"250px"
+        }
+    },
+    mutations: {
+        // 记录用户信息
+        SET_USERINFO(state,user){
+            state.user = user
+        },
+        // 展开/缩起侧边
+        handleAsideWidth(state){
+            state.asideWidth = state.asideWidth == "250px" ? "64px" : "250px"
+        }
+    },
+```
+
+
+
+#### 2. 给展开收起按钮绑定事件实现菜单图标切换
+
+`/layout/components/FHeader.vue`
+
+```vue
+ <el-icon class="icon-btn" @click="$store.commit('handleAsideWidth')">
+    <fold v-if="$store.state.asideWidth == '250px'"/>
+    <Expand v-else/>
+ </el-icon>
+```
+
+
+
+
+
+#### 3. 实现菜单展开与收起
+
+`FMenu.vue`
+
+```vue
+    <div class="f-menu" :style="{ width:$store.state.asideWidth }">
+        <el-menu unique-opened :collapse="isCollapse" default-active="2" class="border-0" @select="handleSelect" :collapse-transition="false">
+          
+          
+<script setup>
+import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
+const router = useRouter()
+const store = useStore()
+
+// 是否折叠
+const isCollapse = computed(()=> !(store.state.asideWidth == '250px'))
+
+
+ 
+ 
+ <style>
+.f-menu {
+    transition: all 0.2s;
+    top: 64px;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    @apply shadow-md fixed bg-light-50;
+}
+</style>
+```
+
+
+
+`layout/admin.vue`
+
+```vue
+<el-aside :width="$store.state.asideWidth">
+    <f-menu></f-menu>
+</el-aside>
+            
+<style>
+.el-aside{
+    transition: all 0.2s;
+}
+</style>
+```
+
+
+
+### 8.9
+
+### 8.10
+
+### 8.11
+
+### 8.12
+
+### 8.13
+
+### 8.14
+
+### 8.15
+
+### 8.16
+
+### 8.17
+
+### 8.18

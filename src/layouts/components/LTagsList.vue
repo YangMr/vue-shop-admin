@@ -1,5 +1,5 @@
 <template>
-  <div>主控台</div>
+  <div>标签导航栏</div>
 </template>
 
 <script setup lang="ts"></script>

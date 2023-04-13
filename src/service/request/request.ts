@@ -1,7 +1,8 @@
 import axios from 'axios'
 import type { AxiosInstance } from 'axios'
 import { YLRequestInterceptors, YLRequestConfig } from './type'
-import { ElLoading } from 'element-plus'
+// import { ElLoading } from 'element-plus'
+import { toast } from '@/composables/utils'
 
 // import type { LoadingInstance } from 'el-loading'
 
@@ -55,6 +56,7 @@ class YLHttpRequest {
         return res.data.data
       },
       (error) => {
+        toast(error.response.data.msg || '请求失败')
         // loadingInstance.close()
         return Promise.reject(error)
       }

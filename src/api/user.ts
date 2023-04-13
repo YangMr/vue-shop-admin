@@ -23,14 +23,10 @@
 // }
 
 import { YlRequest } from '@/service'
-
-interface Login {
-  username: string
-  password: string
-}
+import { LoginRole, UpdatePasswordRole } from './type/userRole'
 
 // 登录接口
-const login = (data: Login) => {
+const login = (data: LoginRole) => {
   return YlRequest.request({
     url: '/login',
     method: 'post',
@@ -54,4 +50,13 @@ const logout = () => {
   })
 }
 
-export { login, getUserInfo, logout }
+// 修改密码接口
+const updatepassword = (data: UpdatePasswordRole) => {
+  return YlRequest.request({
+    url: '/updatepassword',
+    method: 'post',
+    data
+  })
+}
+
+export { login, getUserInfo, logout, updatepassword }
