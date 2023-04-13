@@ -1,31 +1,39 @@
 <template>
   <div>
-    <h2 @click="test">后台首页</h2>
-    {{ count }}
-    {{ obj.name }}
-    <Test></Test>
+    <el-button
+      type="primary"
+      style="margin-left: 10px"
+      icon="el-icon-plus"
+      @click="handleLogout"
+      >退出登录</el-button
+    >
   </div>
 </template>
 
 <script setup lang="ts">
-import Test from '@/components/Test.vue'
-import { ref, reactive } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const store = useStore()
 
-// 基本数据类型 string number booelan null undefined
-let count = ref(1)
-
-// 引用数据类型 array object
-let obj = reactive({
-  id: 1,
-  name: 'jack',
-  array: ['jack', ' rose']
-})
-
-let test = () => {
-  count.value += 10
-  console.log(count)
-  obj.name = 'rose'
-  console.log(obj)
+const handleLogout = () => {
+  ElMessageBox.confirm('是否要退出登录？', {
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    type: 'warning'
+  })
+    .then(async () => {
+      await store.dispatch('handleLogout')
+      router.push('/login')
+      ElMessage({
+        type: 'success',
+        message: '退出成功'
+      })
+    })
+    .catch((error) => {
+      console.log(error)
+    })
 }
 </script>
 

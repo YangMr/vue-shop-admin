@@ -1,6 +1,7 @@
 import { useCookies } from '@vueuse/integrations/useCookies'
 const TOKEN_KEY = 'admin-token'
 const cookie = useCookies()
+const USER_KEY = 'userInfo'
 
 // 获取token
 export const getToken = () => {

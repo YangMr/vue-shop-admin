@@ -1,4 +1,5 @@
 import { ElNotification } from 'element-plus'
+import nprogress from 'nprogress'
 
 export const toast = (message: string) => {
   ElNotification({
@@ -8,20 +9,12 @@ export const toast = (message: string) => {
   })
 }
 
-// 1. axios 封装
+// 开启进度条
+export const showFullLoading = () => {
+  nprogress.start()
+}
 
-// 2. 同步请求会造成阻塞的问题, 阻塞后面的代码
-// 2. 无法获取到同步发生错误
-
-// async await 同步操作
-
-// try{} catch(err){} finally{取消loading}
-// loading false true
-// true  false
-//
-// 登录成功之后,再获取用户信息, 用户信息获取成功在跳转到主页
-//
-// vue3 使用cookie存储数据
-// cookie.set() cookie.get()
-// cookie 封装
-//
+// 关闭进度条
+export const hideFullLoading = () => {
+  nprogress.done()
+}

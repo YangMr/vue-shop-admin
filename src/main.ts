@@ -4,6 +4,7 @@ import store from './store'
 import App from './App.vue'
 // import 'normalize.css'
 import 'windi.css'
+import 'nprogress/nprogress.css'
 
 import './style/index.scss'
 
@@ -16,4 +17,6 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 
 app.use(router)
 app.use(store)
+
+import './permissions'
 app.mount('#app')

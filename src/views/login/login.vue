@@ -46,7 +46,7 @@
             class="w-[250px]"
             type="primary"
             :loading="loadingInstance"
-            @click="onSubmit(ruleLoginFormRef)"
+            @click="onSubmit"
             >登录</el-button
           >
         </el-form-item>
@@ -56,11 +56,11 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted, onBeforeUnmount } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { login, getUserInfo } from '@/api/test'
-import { setToken } from '@/composables/auth'
 import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+const store = useStore()
 const router = useRouter()
 import { toast } from '@/composables/utils'
 
@@ -68,8 +68,7 @@ const ruleLoginFormRef = ref<FormInstance>()
 const loadingInstance = ref(false)
 
 const form = reactive({
-  username: '',
-  password: ''
+  username: ''
 })
 
 const rules = reactive<FormRules>({
@@ -77,24 +76,29 @@ const rules = reactive<FormRules>({
   password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
 })
 
-const onSubmit = (formEl: FormInstance | undefined) => {
-  if (!formEl) return
+const onKeyUp = (e) => {
+  if (e.key == 'Enter') {
+    onSubmit()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keyup', onKeyUp)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keyup', onKeyUp)
+})
+
+const onSubmit = () => {
   // 第一种 推荐
-  formEl.validate(async (valid) => {
+  ruleLoginFormRef.value.validate(async (valid) => {
     if (!valid) return
     loadingInstance.value = true
 
     try {
-      // 调用登录接口
-      let response = await login(form)
-      console.log('response=>', response)
-
-      // 将token存储到本地
-      setToken(response.token)
-
-      // 调用获取用户信息接口
-      const userInfo = await getUserInfo()
-      console.log('userInfo=>', userInfo)
+      const res = await store.dispatch('handleLogin', form)
+      if (!res) return
 
       toast('登录成功')
 

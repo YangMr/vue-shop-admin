@@ -57,4 +57,17 @@
 // }
 // console.log(obj)
 
+interface login {
+  username: string
+  password: string
+}
+const obj = { password: '1' }
+
+function a({ name }, str: login) {
+  console.log(name)
+  console.log(str)
+}
+
+a({ name: 'jack' }, obj)
+
 export {}

@@ -5,11 +5,18 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import('@/views/index.vue')
+    component: () => import('@/views/index.vue'),
+    meta: {
+      title: '后台首页'
+    }
   },
   {
     path: '/login',
-    component: () => import('@/views/login/login.vue')
+    name: 'login',
+    component: () => import('@/views/login/login.vue'),
+    meta: {
+      title: '登录页'
+    }
   },
   {
     path: '/main',
@@ -18,7 +25,10 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/:pathMatch(.*)*',
     name: 'NotFound',
-    component: () => import('@/views/404.vue')
+    component: () => import('@/views/404.vue'),
+    meta: {
+      title: '404'
+    }
   }
 ]
 
