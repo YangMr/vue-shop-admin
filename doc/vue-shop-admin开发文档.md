@@ -4884,7 +4884,126 @@ const handleRefresh = () => location.reload()
 
 
 
-### 8.8 
+### 8.8 侧边菜单开发 - 样式布局与路由跳转
+
+#### 1. 利用element-plus的menu组件实现菜单样式与布局
+
+`FMenu.vue`
+
+```vue
+<template>
+    <div class="f-menu">
+        <el-menu default-active="2" class="border-0" @select="handleSelect">
+
+            <template v-for="(item,index) in asideMenus" :key="index">
+                <el-sub-menu v-if="item.child && item.child.length > 0" :index="item.name">
+                    <template #title>
+                        <el-icon>
+                            <component :is="item.icon"></component>
+                        </el-icon>
+                        <span>{{ item.name }}</span>
+                    </template>
+                    <el-menu-item v-for="(item2,index2) in item.child" :key="index2" :index="item2.frontpath">
+                        <el-icon>
+                            <component :is="item2.icon"></component>
+                        </el-icon>
+                        <span>{{ item2.name }}</span>
+                    </el-menu-item>
+                </el-sub-menu>
+
+                <el-menu-item v-else :index="item.frontpath">
+                    <el-icon>
+                         <component :is="item.icon"></component>
+                    </el-icon>
+                    <span>{{ item.name }}</span>
+                </el-menu-item>
+            </template>
+        </el-menu>
+    </div>
+</template>
+<script setup>
+import { useRouter } from 'vue-router';
+const router = useRouter()
+const asideMenus = [{
+    "name": "后台面板",
+    "icon": "help",
+    "child": [{
+        "name": "主控台",
+        "icon": "home-filled",
+        "frontpath": "/",
+    }]
+}, {
+    "name": "商城管理",
+    "icon": "shopping-bag",
+    "child": [{
+        "name": "商品管理",
+        "icon": "shopping-cart-full",
+        "frontpath": "/goods/list",
+    }]
+}]
+
+const handleSelect = (e)=>{
+    router.push(e)
+}
+</script>
+<style>
+.f-menu {
+    width: 250px;
+    top: 64px;
+    bottom: 0;
+    left: 0;
+    overflow: auto;
+    @apply shadow-md fixed bg-light-50;
+}
+</style>
+```
+
+
+
+#### 2. 创建对应页面组件与路由
+
+创建对应页面组件
+
+`pages/goods/list.vue`
+
+
+
+创建对应路由
+
+```javascript
+const routes = [
+    {
+        path:"/",
+        component:Admin,
+        // 子路由
+        children:[{
+            path:"/",
+            component:Index,
+            meta:{
+                title:"后台首页"
+            }
+        },{
+            path:"/goods/list",
+            component:GoodList,
+            meta:{
+                title:"商品管理"
+            }
+        }]
+    },
+{
+    path:"/login",
+    component:Login,
+    meta:{
+        title:"登录页"
+    }
+},{ 
+    path: '/:pathMatch(.*)*', 
+    name: 'NotFound', 
+    component: NotFound 
+}]
+```
+
+
 
 
 
@@ -4986,20 +5105,1053 @@ const isCollapse = computed(()=> !(store.state.asideWidth == '250px'))
 
 
 
-### 8.10
+### 8.10 菜单选中和路由关联
 
-### 8.11
+#### 1. 使用default-active设置默认选中菜单
 
-### 8.12
+```vue
+<el-menu :default-active="defaultActive" unique-opened :collapse="isCollapse" default-active="2" class="border-0" @select="handleSelect" :collapse-transition="false">
+  
+  
+<script setup>
+import { computed,ref } from 'vue';
+import { useRouter,useRoute } from 'vue-router';
+const route = useRoute()
 
-### 8.13
+// 默认选中
+const defaultActive = ref(route.path)
 
-### 8.14
+</script>
+```
 
-### 8.15
 
-### 8.16
 
-### 8.17
+### 8.11 菜单数据前后端交互
 
-### 8.18
+#### 1. 实现在vuex中存储菜单数据以及按钮权限数据
+
+`store/index.js`
+
+```javascript
+import { createStore } from 'vuex'
+import { login,getinfo } from '~/api/manager'
+import {
+    setToken,
+    removeToken
+} from '~/composables/auth'
+const store = createStore({
+    state() {
+        return {
+            menus:[],
+            ruleNames:[]
+        }
+    },
+    mutations: {
+        SET_MENUS(state,menus){
+            state.menus = menus
+        },
+        SET_RULENAMES(state,ruleNames){
+            state.ruleNames = ruleNames
+        }
+    },
+    actions:{
+        // 获取当前登录用户信息
+        getinfo({ commit }){
+            return new Promise((resolve,reject)=>{
+                getinfo().then(res=>{
+                    commit("SET_USERINFO",res)
+                    commit("SET_MENUS",res.menus)
+                    commit("SET_RULENAMES",res.ruleNames)
+                    resolve(res)
+                }).catch(err=>reject(err))
+            })
+        },
+       
+    }
+})
+
+export default store
+```
+
+
+
+#### 2. 获取vuex中存储的菜单数据并进行渲染
+
+`FMenu.vue`
+
+```javascript
+<script setup>
+import { computed,ref } from 'vue';
+import { useRouter,useRoute } from 'vue-router';
+import { useStore } from 'vuex';
+const router = useRouter()
+const store = useStore()
+const route = useRoute()
+
+// 默认选中
+const defaultActive = ref(route.path)
+
+// 是否折叠
+const isCollapse = computed(()=> !(store.state.asideWidth == '250px'))
+
+const asideMenus = computed(()=>store.state.menus)
+
+const handleSelect = (e)=>{
+    router.push(e)
+}
+</script>
+```
+
+
+
+#### 3. 定义菜单组件
+
+`pages/category/list.vue`
+
+```vue
+<template>
+	<div>
+    分类列表
+  </div>  
+</template>
+```
+
+
+
+#### 4. 配置菜单路由
+
+`router/index.js`
+
+```javascript
+import CategoryList from '~/pages/category/list.vue'
+{
+    path:"/category/list",
+    component:CategoryList,
+    meta:{
+       title:"分类列表"
+    }
+}
+```
+
+
+
+#### 5. 隐藏菜单滚动条
+
+`FMenu.vue`
+
+```vue
+<style>
+.f-menu {
+    transition: all 0.2s;
+    top: 64px;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    @apply shadow-md fixed bg-light-50;
+}
+.f-menu::-webkit-scrollbar{
+    width: 0px;
+}
+</style>
+```
+
+
+
+### 8.12 根据菜单动态生成路由
+
+#### 1. 将路由抽离成静态路由和动态路由
+
+`router/index.js`
+
+```javascript
+// 默认路由，所有用户共享
+const routes = [
+    {
+        path: "/",
+        name:"admin",
+        component: Admin,
+    },
+    {
+        path: "/login",
+        component: Login,
+        meta: {
+            title: "登录页"
+        }
+    }, {
+        path: '/:pathMatch(.*)*',
+        name: 'NotFound',
+        component: NotFound
+    }]
+
+
+// 动态路由，用于匹配菜单动态添加路由
+const asyncRoutes = [{
+    path:"/",
+    name:"/",
+    component:Index,
+    meta:{
+        title:"后台首页"
+    }
+},{
+    path:"/goods/list",
+    name:"/goods/list",
+    component:GoodList,
+    meta:{
+        title:"商品管理"
+    }
+},{
+    path:"/category/list",
+    name:"/category/list",
+    component:CategoryList,
+    meta:{
+        title:"分类列表"
+    }
+}]
+
+export const router = createRouter({
+    history: createWebHashHistory(),
+    routes
+})
+```
+
+
+
+#### 2. 根据后台返回的菜单数据从前端自定义的路由表中匹配出当前用户所拥有的路由表
+
+`router/index.js`
+
+```javascript
+// 动态添加路由的方法
+export function addRoutes(menus){
+
+    const findAndAddRoutesByMenus = (arr) =>{
+        arr.forEach(e=>{
+            let item = asyncRoutes.find(o=>o.path == e.frontpath)
+            if(item && !router.hasRoute(item.path)){
+                router.addRoute("admin",item)
+                hasNewRoutes = true
+            }
+            if(e.child && e.child.length > 0){
+                findAndAddRoutesByMenus(e.child)
+            }
+        })
+    }
+
+    findAndAddRoutesByMenus(menus)
+		
+  	console.log(router.getRoutes)
+}
+```
+
+
+
+#### 3. 修改router的引入
+
+`main.js`
+
+```javascript
+import { router } from './router'
+```
+
+`permission.js`
+
+```javascript
+import { router } from "~/router"
+```
+
+
+
+#### 4. 在路由守卫中动态添加路由
+
+`permission.js`
+
+```javascript
+import { router,addRoutes } from "~/router"
+import { getToken } from "~/composables/auth"
+import { 
+    toast,
+    showFullLoading,
+    hideFullLoading
+} from "~/composables/util"
+import store from "./store"
+
+// 全局前置守卫
+router.beforeEach(async (to,from,next)=>{
+    // 显示loading
+    showFullLoading()
+
+    const token = getToken()
+
+    // 没有登录，强制跳转回登录页
+    if(!token && to.path != "/login"){
+        toast("请先登录","error")
+        return next({ path:"/login" })
+    }
+
+    // 防止重复登录
+    if(token && to.path == "/login"){
+        toast("请勿重复登录","error")
+        return next({ path:from.path ? from.path : "/" })
+    }
+
+    // 如果用户登录了，自动获取用户信息，并存储在vuex当中
+    let hasNewRoutes = false
+    if(token){
+        let { menus } = await store.dispatch("getinfo")
+        // 动态添加路由
+        hasNewRoutes = addRoutes(menus)
+    }
+
+    // 设置页面标题
+    let title = (to.meta.title ? to.meta.title : "") + "-帝莎编程商城后台"
+    document.title = title
+
+    hasNewRoutes ? next(to.fullPath) : next()
+})
+
+// 全局后置守卫
+router.afterEach((to, from) => hideFullLoading())
+```
+
+
+
+#### 5. 解决浏览器刷新白屏问题
+
+`router/index.js`
+
+```javascript
+// 动态添加路由的方法
+export function addRoutes(menus){
+    // 是否有新的路由
+    let hasNewRoutes = false
+    const findAndAddRoutesByMenus = (arr) =>{
+        arr.forEach(e=>{
+            let item = asyncRoutes.find(o=>o.path == e.frontpath)
+            if(item && !router.hasRoute(item.path)){
+                router.addRoute("admin",item)
+                hasNewRoutes = true
+            }
+            if(e.child && e.child.length > 0){
+                findAndAddRoutesByMenus(e.child)
+            }
+        })
+    }
+
+    findAndAddRoutesByMenus(menus)
+
+    return hasNewRoutes
+}
+```
+
+
+
+### 8.13 标签导航组件实现 - 样式布局
+
+#### 1. 利用element-plus的Tabs实现标签栏
+
+https://element-plus.gitee.io/zh-CN/component/tabs.html
+
+`FTagList.vue`
+
+```vue
+<template>
+  <div >
+  	<el-tabs
+    v-model="editableTabsValue"
+    type="card"
+    class="demo-tabs"
+    closable
+    @tab-remove="removeTab"
+  >
+    <el-tab-pane
+      v-for="item in editableTabs"
+      :key="item.name"
+      :label="item.title"
+      :name="item.name"
+    >
+      {{ item.content }}
+    </el-tab-pane>
+  </el-tabs>
+  </div>
+</template>
+<script  setup>
+import { ref } from 'vue'
+
+let tabIndex = 2
+const editableTabsValue = ref('2')
+const editableTabs = ref([
+  {
+    title: 'Tab 1',
+    name: '1',
+    content: 'Tab 1 content',
+  },
+  {
+    title: 'Tab 2',
+    name: '2',
+    content: 'Tab 2 content',
+  },
+])
+
+const addTab = (targetName: string) => {
+  const newTabName = `${++tabIndex}`
+  editableTabs.value.push({
+    title: 'New Tab',
+    name: newTabName,
+    content: 'New Tab content',
+  })
+  editableTabsValue.value = newTabName
+}
+const removeTab = (targetName: string) => {
+  const tabs = editableTabs.value
+  let activeName = editableTabsValue.value
+  if (activeName === targetName) {
+    tabs.forEach((tab, index) => {
+      if (tab.name === targetName) {
+        const nextTab = tabs[index + 1] || tabs[index - 1]
+        if (nextTab) {
+          activeName = nextTab.name
+        }
+      }
+    })
+  }
+
+  editableTabsValue.value = activeName
+  editableTabs.value = tabs.filter((tab) => tab.name !== targetName)
+}
+</script>
+```
+
+
+
+#### 2. 使用element-plus的dropdown实现标签导航栏的下拉菜单
+
+```vue
+<template>
+  <div >
+  	<el-tabs
+    v-model="editableTabsValue"
+    type="card"
+    class="demo-tabs"
+    closable
+    @tab-remove="removeTab"
+  >
+    <el-tab-pane
+      v-for="item in editableTabs"
+      :key="item.name"
+      :label="item.title"
+      :name="item.name"
+    >
+      {{ item.content }}
+    </el-tab-pane>
+  </el-tabs>
+    
+    <span>
+    	<el-dropdown @command="handleCommand">
+      <span class="el-dropdown-link">
+        Dropdown List  // 删掉这段
+        <el-icon class="el-icon--right"><arrow-down /></el-icon>
+      </span>
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item command="a">Action 1</el-dropdown-item>
+          <el-dropdown-item command="b">Action 2</el-dropdown-item>
+          <el-dropdown-item command="c">Action 3</el-dropdown-item>
+          <el-dropdown-item command="d" disabled>Action 4</el-dropdown-item>
+          <el-dropdown-item command="e" divided>Action 5</el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>  
+  	</span>  
+  </div>
+</template>
+
+<script  setup>
+import { ref } from 'vue'
+
+let tabIndex = 2
+const editableTabsValue = ref('2')
+const editableTabs = ref([
+  {
+    title: 'Tab 1',
+    name: '1',
+    content: 'Tab 1 content',
+  },
+  {
+    title: 'Tab 2',
+    name: '2',
+    content: 'Tab 2 content',
+  },
+])
+
+const addTab = (targetName) => {
+  const newTabName = `${++tabIndex}`
+  editableTabs.value.push({
+    title: 'New Tab',
+    name: newTabName,
+    content: 'New Tab content',
+  })
+  editableTabsValue.value = newTabName
+}
+const removeTab = (targetName) => {
+  const tabs = editableTabs.value
+  let activeName = editableTabsValue.value
+  if (activeName === targetName) {
+    tabs.forEach((tab, index) => {
+      if (tab.name === targetName) {
+        const nextTab = tabs[index + 1] || tabs[index - 1]
+        if (nextTab) {
+          activeName = nextTab.name
+        }
+      }
+    })
+  }
+
+  editableTabsValue.value = activeName
+  editableTabs.value = tabs.filter((tab) => tab.name !== targetName)
+}
+
+const handleCommand = (command) => {
+  console.log(`click on item ${command}`)
+}
+</script>
+```
+
+
+
+#### 3. 实现样式布局
+
+```vue
+<template>
+    <div class="f-tag-list" :style="{ left:$store.state.asideWidth }">
+				<!--style="min-width:100px;"  主要的作用是可以设置横向滚动-->
+        <el-tabs v-model="editableTabsValue" type="card" class="flex-1" closable @tab-remove="removeTab" style="min-width:100px;">
+            <el-tab-pane v-for="item in editableTabs" :key="item.name" :label="item.title" :name="item.name"></el-tab-pane>
+        </el-tabs>
+
+        <span class="tag-btn">
+            <el-dropdown>
+                <span class="el-dropdown-link">
+                    <el-icon class="el-icon--right">
+                        <arrow-down />
+                    </el-icon>
+                </span>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item>Action 1</el-dropdown-item>
+                        <el-dropdown-item>Action 2</el-dropdown-item>
+                        <el-dropdown-item>Action 3</el-dropdown-item>
+                        <el-dropdown-item disabled>Action 4</el-dropdown-item>
+                        <el-dropdown-item divided>Action 5</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+        </span>
+
+    </div>
+</template>
+<script setup>
+import { ref } from 'vue'
+
+let tabIndex = 2
+const editableTabsValue = ref('2')
+const editableTabs = ref([
+    {
+        title: 'Tab 1',
+        name: '1',
+        content: 'Tab 1 content',
+    },
+    {
+        title: 'Tab 2',
+        name: '2',
+        content: 'Tab 2 content',
+    },
+    {
+        title: 'Tab 1',
+        name: '1',
+        content: 'Tab 1 content',
+    },
+    {
+        title: 'Tab 2',
+        name: '2',
+        content: 'Tab 2 content',
+    },
+    {
+        title: 'Tab 1',
+        name: '1',
+        content: 'Tab 1 content',
+    },
+    {
+        title: 'Tab 2',
+        name: '2',
+        content: 'Tab 2 content',
+    },
+    {
+        title: 'Tab 1',
+        name: '1',
+        content: 'Tab 1 content',
+    },
+    {
+        title: 'Tab 2',
+        name: '2',
+        content: 'Tab 2 content',
+    },
+])
+
+const addTab = (targetName) => {
+    const newTabName = `${++tabIndex}`
+    editableTabs.value.push({
+        title: 'New Tab',
+        name: newTabName,
+        content: 'New Tab content',
+    })
+    editableTabsValue.value = newTabName
+}
+const removeTab = (targetName) => {
+    const tabs = editableTabs.value
+    let activeName = editableTabsValue.value
+    if (activeName === targetName) {
+        tabs.forEach((tab, index) => {
+            if (tab.name === targetName) {
+                const nextTab = tabs[index + 1] || tabs[index - 1]
+                if (nextTab) {
+                    activeName = nextTab.name
+                }
+            }
+        })
+    }
+
+    editableTabsValue.value = activeName
+    editableTabs.value = tabs.filter((tab) => tab.name !== targetName)
+}
+</script>
+<style scoped>
+.f-tag-list{
+    @apply fixed bg-gray-100 flex items-center px-2;
+    top: 64px;
+    right: 0;
+    height: 44px;
+    z-index: 100;
+}
+.tag-btn{
+    @apply bg-white rounded ml-auto flex items-center justify-center px-2;
+    height: 32px;
+}
+:deep(.el-tabs__header){
+    @apply mb-0;
+}
+:deep(.el-tabs__nav){
+    border: 0!important;
+}
+:deep(.el-tabs__item){
+    border: 0!important;
+    height: 32px;
+    line-height: 32px;
+    @apply bg-white mx-1 rounded;
+}
+:deep(.el-tabs__nav-next),:deep(.el-tabs__nav-prev){
+    line-height: 32px;
+    height: 32px;
+}
+:deep(.is-disabled){
+    cursor: not-allowed;
+    @apply text-gray-300;
+}
+</style>
+```
+
+
+
+### 8.14 标签导航组件实现 - 同步路由和存储(一)
+
+#### 1. 删除下拉菜单的箭头图标类名
+
+```vue
+ <span class="el-dropdown-link">
+    <el-icon>
+       <arrow-down />
+    </el-icon>
+</span>
+```
+
+
+
+#### 2. 定义标签导航栏数据
+
+```javascript
+const tabList = ref([
+    {
+        title: '后台首页',
+        path:"/"
+    },
+    {
+          title: '商城管理',
+          path:"/goods/list"
+      },
+])
+```
+
+
+
+#### 3. 动态渲染导航栏数据
+
+```vue
+<el-tabs v-model="activeTab" type="card" class="flex-1" @tab-remove="removeTab" style="min-width:100px;"
+        @tab-change="changeTab">
+            <el-tab-pane :closable="item.path != '/'" v-for="item in tabList" :key="item.path" :label="item.title" :name="item.path"></el-tab-pane>
+        </el-tabs>
+```
+
+`closable="item.path != '/'"`这个是设置后台首页不需要关闭按钮
+
+#### 4.  删除addTab以及清空removeTab的内容
+
+
+
+#### 5. 修改方法名称
+
+```javascript
+const activeTab = ref(null)
+const tabList = ref([
+    {
+        title: '后台首页',
+        path:"/"
+    },
+])
+```
+
+
+
+#### 6. 刷新页面选中默认路径
+
+```javascript
+import { useRoute,onBeforeRouteUpdate } from 'vue-router';
+const route = useRoute()
+
+const activeTab = ref(route.path)
+```
+
+
+
+### 8.15 标签导航组件实现 - 同步路由和存储(二)
+
+#### 1. 获取路由跳转的信息,并进行添加
+
+```javascript
+// 添加标签导航
+function addTab(tab){
+    let noTab = tabList.value.findIndex(t=>t.path == tab.path) == -1
+    if(noTab){
+        tabList.value.push(tab)
+    }
+
+    // cookie.set("tabList",tabList.value)
+}
+
+onBeforeRouteUpdate((to,from)=>{
+    // activeTab.value = to.path
+    addTab({
+        title:to.meta.title,
+        path:to.path
+    })
+}) 
+```
+
+
+
+#### 2. 将标签导航栏的数据存储到本地,用以解决浏览器刷新数据丢失问题, 并设置导航处于激活状态
+
+```javascript
+import { useCookies } from '@vueuse/integrations/useCookies'
+const cookie = useCookies()
+
+// 添加标签导航
+function addTab(tab){
+    let noTab = tabList.value.findIndex(t=>t.path == tab.path) == -1
+    if(noTab){
+        tabList.value.push(tab)
+    }
+
+    cookie.set("tabList",tabList.value)
+}
+
+// 初始化标签导航列表
+function initTabList(){
+    let tbs = cookie.get("tabList")
+    if(tbs){
+        tabList.value = tbs
+    }
+}
+
+initTabList()
+
+onBeforeRouteUpdate((to,from)=>{
+  	// 设置导航处于激活状态
+    activeTab.value = to.path
+  	// 添加tab
+    addTab({
+        title:to.meta.title,
+        path:to.path
+    })
+})  
+```
+
+
+
+#### 3. 点击tab能够进行路由跳转
+
+```vue
+<el-tabs v-model="activeTab" type="card" class="flex-1" @tab-remove="removeTab" style="min-width:100px;"
+        @tab-change="changeTab">
+
+const changeTab = (t)=>{
+    activeTab.value = t
+    router.push(t)
+}
+```
+
+
+
+#### 4. 解决内容被覆盖问题
+
+```vue
+<div style="height:44px;"></div>
+
+:deep(.el-tabs__header){
+    border: 0!important;
+    @apply mb-0;
+}
+```
+
+
+
+### 8.16  标签导航组件实现 - 关闭当前标签栏处理
+
+#### 1. 实现点击关闭当前标签栏
+
+```javascript
+const removeTab = (t) => {
+    let tabs = tabList.value
+    let a = activeTab.value
+    // 判断当前关闭的是不是激活的
+    if(a == t){
+        tabs.forEach((tab,index)=>{
+          // 如果是
+            if(tab.path == t){
+                // 则拿到当前关闭的后一条数据, 如果没有后一条数据,则拿到前一条数据
+                const nextTab = tabs[index+1] || tabs[index-1]
+                // 如果数据存在,则把获取到的数据赋值为变量a
+                if(nextTab){
+                    a = nextTab.path
+                }
+            }
+        })
+    }
+
+    activeTab.value = a
+  
+  	// 重新更新标签栏的数据
+    tabList.value = tabList.value.filter(tab=>tab.path != t)
+		
+  	// 将标签栏的数据重新存储到本地
+    cookie.set("tabList",tabList.value)
+}
+```
+
+
+
+### 8.17 标签导航组件实现 - 关闭其他全部标签功能
+
+#### 1. 修改下拉菜单文本
+
+```vue
+<span class="tag-btn">
+            <el-dropdown @command="handleClose">
+                <span class="el-dropdown-link">
+                    <el-icon>
+                        <arrow-down />
+                    </el-icon>
+                </span>
+                <template #dropdown>
+                    <el-dropdown-menu>
+                        <el-dropdown-item command="clearOther">关闭其他</el-dropdown-item>
+                        <el-dropdown-item command="clearAll">全部关闭</el-dropdown-item>
+                    </el-dropdown-menu>
+                </template>
+            </el-dropdown>
+        </span>
+```
+
+
+
+#### 2. 实现关闭其他以及关闭全部功能
+
+```javascript
+const handleClose = (c) => {
+        if (c == "clearAll") {
+            // 切换回首页
+            activeTab.value = "/"
+            // 过滤只剩下首页
+            tabList.value = [{
+                title: '后台首页',
+                path: "/"
+            }]
+        } else if (c == "clearOther") {
+            // 过滤只剩下首页和当前激活
+            tabList.value = tabList.value.filter(tab => tab.path == "/" || tab.path == activeTab.value)
+        }
+        cookie.set("tabList", tabList.value)
+    }
+```
+
+
+
+#### 3. 使用Composables 组合式函数优化代码
+
+`composables/useTabList.js`
+
+```javascript
+import { ref } from 'vue'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router';
+import { useCookies } from '@vueuse/integrations/useCookies'
+import { router } from '~/router';
+
+export function useTabList() {
+    const route = useRoute()
+    const cookie = useCookies()
+
+    const activeTab = ref(route.path)
+    const tabList = ref([
+        {
+            title: '后台首页',
+            path: "/"
+        },
+    ])
+
+    // 添加标签导航
+    function addTab(tab) {
+        let noTab = tabList.value.findIndex(t => t.path == tab.path) == -1
+        if (noTab) {
+            tabList.value.push(tab)
+        }
+
+        cookie.set("tabList", tabList.value)
+    }
+
+    // 初始化标签导航列表
+    function initTabList() {
+        let tbs = cookie.get("tabList")
+        if (tbs) {
+            tabList.value = tbs
+        }
+    }
+
+    initTabList()
+
+    onBeforeRouteUpdate((to, from) => {
+        activeTab.value = to.path
+        addTab({
+            title: to.meta.title,
+            path: to.path
+        })
+    })
+
+    const changeTab = (t) => {
+        activeTab.value = t
+        router.push(t)
+    }
+
+    const removeTab = (t) => {
+        let tabs = tabList.value
+        let a = activeTab.value
+        if (a == t) {
+            tabs.forEach((tab, index) => {
+                if (tab.path == t) {
+                    const nextTab = tabs[index + 1] || tabs[index - 1]
+                    if (nextTab) {
+                        a = nextTab.path
+                    }
+                }
+            })
+        }
+
+        activeTab.value = a
+        tabList.value = tabList.value.filter(tab => tab.path != t)
+
+        cookie.set("tabList", tabList.value)
+    }
+
+    const handleClose = (c) => {
+        if (c == "clearAll") {
+            // 切换回首页
+            activeTab.value = "/"
+            // 过滤只剩下首页
+            tabList.value = [{
+                title: '后台首页',
+                path: "/"
+            }]
+        } else if (c == "clearOther") {
+            // 过滤只剩下首页和当前激活
+            tabList.value = tabList.value.filter(tab => tab.path == "/" || tab.path == activeTab.value)
+        }
+        cookie.set("tabList", tabList.value)
+    }
+
+    return {
+        activeTab,
+        tabList,
+        changeTab,
+        removeTab,
+        handleClose
+    }
+}
+```
+
+
+
+`FTagList.vue`
+
+```javascript
+import { useTabList } from "~/composables/useTabList.js"
+const {
+    activeTab,
+    tabList,
+    changeTab,
+    removeTab,
+    handleClose
+} = useTabList()
+```
+
+
+
+### 8.18 keep-alive页面缓存
+
+#### 1. 演示页面缓存效果
+
+#### 2. 使用keep-alive实现页面缓存
+
+`layout/admin.vue`
+
+```vue
+<template>
+    <el-container>
+        <el-header>
+            <f-header/>
+        </el-header>
+        <el-container>
+            <el-aside :width="$store.state.asideWidth">
+                <f-menu></f-menu>
+            </el-aside>
+            <el-main>
+                <f-tag-list/>
+                <router-view v-slot="{ Component }">
+                    <keep-alive :max="10">
+                        <component :is="Component"></component>
+                    </keep-alive>
+                </router-view>
+            </el-main>
+        </el-container>
+    </el-container>
+</template>
+```
+

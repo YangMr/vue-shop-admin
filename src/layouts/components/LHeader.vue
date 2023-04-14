@@ -5,7 +5,10 @@
       <span>九月编程</span>
     </div>
 
-    <el-icon class="icon__button"><Fold /></el-icon>
+    <el-icon class="icon__button" @click="$store.commit('setAsideWidth')">
+      <Fold v-if="$store.state.asideWidth === '250px'" />
+      <Expand v-else />
+    </el-icon>
 
     <el-tooltip effect="dark" content="刷新" placement="bottom">
       <el-icon class="icon__button" @click="handleRefresh"><Refresh /></el-icon>

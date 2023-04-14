@@ -8,10 +8,31 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/layouts/admin.vue'),
     children: [
       {
-        path: '',
+        path: '/',
         component: () => import('@/views/index.vue'),
         meta: {
           title: '后台首页'
+        }
+      },
+      {
+        path: '/goods/list',
+        component: () => import('@/views/goods/list.vue'),
+        meta: {
+          title: '商品管理'
+        }
+      },
+      {
+        path: '/category/list',
+        component: () => import('@/views/category/list.vue'),
+        meta: {
+          title: '分类管理'
+        }
+      },
+      {
+        path: '/skus/list',
+        component: () => import('@/views/skus/list.vue'),
+        meta: {
+          title: '规格管理'
         }
       }
     ]

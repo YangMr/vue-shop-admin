@@ -1,10 +1,10 @@
 <template>
-  <el-container>
+  <el-container class="h-[100%]">
     <el-header>
       <LHeader></LHeader>
     </el-header>
-    <el-container>
-      <el-aside width="200px">
+    <el-container class="h-[100%]">
+      <el-aside class="h-[100%]" :style="{ width: $store.state.asideWidth }">
         <LMenu></LMenu>
       </el-aside>
       <el-main>
@@ -27,4 +27,7 @@ import LTagsList from './components/LTagsList.vue'
 // .el-header {
 //   padding: 0;
 // }
+.el-aside {
+  transition: all 0.2s;
+}
 </style>
