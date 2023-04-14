@@ -4884,7 +4884,11 @@ const handleRefresh = () => location.reload()
 
 
 
-### 8.8 展开和收起菜单功能实现
+### 8.8 
+
+
+
+### 8.9 展开和收起菜单功能实现
 
 #### 1. 在vuex定义侧边栏宽度以及修改侧边栏样式方法
 
@@ -4981,8 +4985,6 @@ const isCollapse = computed(()=> !(store.state.asideWidth == '250px'))
 ```
 
 
-
-### 8.9
 
 ### 8.10
 

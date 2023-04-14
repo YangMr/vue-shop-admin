@@ -56,60 +56,8 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted, onBeforeUnmount } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { useRouter } from 'vue-router'
-import { useStore } from 'vuex'
-const store = useStore()
-const router = useRouter()
-import { toast } from '@/composables/utils'
-
-const ruleLoginFormRef = ref<FormInstance>()
-const loadingInstance = ref(false)
-
-const form = reactive({
-  username: ''
-})
-
-const rules = reactive<FormRules>({
-  username: [{ required: true, message: '用户名不能为空', trigger: 'blur' }],
-  password: [{ required: true, message: '密码不能为空', trigger: 'blur' }]
-})
-
-const onKeyUp = (e) => {
-  if (e.key == 'Enter') {
-    onSubmit()
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('keyup', onKeyUp)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('keyup', onKeyUp)
-})
-
-const onSubmit = () => {
-  // 第一种 推荐
-  ruleLoginFormRef.value.validate(async (valid) => {
-    if (!valid) return
-    loadingInstance.value = true
-
-    try {
-      const res = await store.dispatch('handleLogin', form)
-      if (!res) return
-
-      toast('登录成功')
-
-      router.push('/')
-    } catch (error) {
-      console.log('error', error)
-    } finally {
-      loadingInstance.value = false
-    }
-  })
-}
+import { useLogin } from '@/composables/useLogin'
+const { ruleLoginFormRef, loadingInstance, form, rules, onSubmit } = useLogin()
 </script>
 
 <style lang="postcss">

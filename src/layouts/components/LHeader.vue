@@ -40,11 +40,12 @@
       </el-dropdown>
     </div>
 
-    <el-drawer
-      v-model="drawer"
+    <!-- title size confirmText -->
+    <FormDrawer
+      @close="handleClose"
+      @submit="submitForm"
       title="修改密码"
-      size="45%"
-      :close-on-click-modal="false"
+      ref="formDrawerRef"
     >
       <el-form
         ref="ruleFormRef"
@@ -71,60 +72,28 @@
         <el-form-item label="确认密码" prop="repassword">
           <el-input type="password" v-model.trim="passForm.repassword" />
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :loading="loadingStatus" @click="submitForm"
-            >确认</el-button
-          >
-          <el-button>取消</el-button>
-        </el-form-item>
       </el-form>
-    </el-drawer>
+    </FormDrawer>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { useStore } from 'vuex'
-import { useRouter } from 'vue-router'
+import FormDrawer from '@/components/FormDrawer.vue'
 import { useFullscreen } from '@vueuse/core'
-import { reactive, ref } from 'vue'
-import { updatepassword } from '@/api/user'
-import type { FormInstance, FormRules } from 'element-plus'
+import { useRepassword, useLogout } from '../../composables/useHeader'
 const { isFullscreen, toggle } = useFullscreen()
 
-const router = useRouter()
-const store = useStore()
+const {
+  ruleFormRef,
+  formDrawerRef,
+  handleOpenDrawer,
+  passForm,
+  rules,
+  submitForm,
+  handleClose
+} = useRepassword()
 
-// 定义抽屉的状态 false 关闭 true 打开
-const drawer = ref(false)
-
-// 定义按钮loading的状态
-const loadingStatus = ref(false)
-
-// 退出登录
-const handleLogout = () => {
-  ElMessageBox.confirm('是否要退出登录？', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-    .then(async () => {
-      await store.dispatch('handleLogout')
-      router.push('/login')
-      ElMessage({
-        type: 'success',
-        message: '退出成功'
-      })
-    })
-    .catch((error) => {
-      console.log(error)
-    })
-}
-
-// 打开修改密码弹窗方法
-const handleOpenDrawer = () => {
-  drawer.value = true
-}
+const { handleLogout } = useLogout()
 
 // 点击下拉菜单选项触发的方法
 const handleCommand = (command: string | number | object) => {
@@ -143,53 +112,6 @@ const handleCommand = (command: string | number | object) => {
 // 刷新页面方法
 const handleRefresh = () => {
   window.location.reload()
-  // router.go(0)
-}
-
-const ruleFormRef = ref<FormInstance>()
-
-// 确认密码验证函数
-const validatorRepassword = (rule: any, value: any, callback: any) => {
-  console.log('value=>', value)
-  if (value !== passForm.password) {
-    return callback(new Error('密码不一致,请重新输入'))
-  }
-  callback()
-}
-
-// 修改密码表单数据
-const passForm = reactive({
-  oldpassword: '',
-  password: '',
-  repassword: ''
-})
-
-// 表单验证规则
-const rules = reactive<FormRules>({
-  oldpassword: [{ required: true, message: '旧密码不能为空', trigger: 'blur' }],
-  password: [{ required: true, message: '密码不能为空', trigger: 'blur' }],
-  repassword: [
-    { required: true, message: '确认密码不能为空', trigger: 'blur' },
-    { validator: validatorRepassword, trigger: 'blur' }
-  ]
-})
-
-// 修改密码方法
-const submitForm = () => {
-  ruleFormRef.value.validate(async (valid) => {
-    if (valid) {
-      try {
-        loadingStatus.value = true
-        await updatepassword(passForm)
-      } catch (error) {
-        console.log('error', error)
-      } finally {
-        loadingStatus.value = false
-      }
-      await store.dispatch('handleLogout')
-      router.push('/login')
-    }
-  })
 }
 </script>
 
