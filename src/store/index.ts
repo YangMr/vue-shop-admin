@@ -38,6 +38,7 @@ const store = createStore({
       return res
     },
     async handleUserInfo({ commit }) {
+      // 获取用户信息接口
       const res: any = await getUserInfo()
       commit('setUser', res)
       commit('setMenus', res.menus)

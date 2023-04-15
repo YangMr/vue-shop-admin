@@ -51,6 +51,7 @@ const isCollpase = computed(() => {
   return !(store.state.asideWidth === '250px')
 })
 
+// 获取vuex中state里面的menus的数据, 菜单数据
 const menus = computed(() => store.state.menus)
 </script>
 

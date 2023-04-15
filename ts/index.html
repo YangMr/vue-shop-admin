@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- <ul> -->
+    <!-- <li>
+        IT互联网
+        <ul>
+          <li>编辑语言</li>
+          <li>移动开发</li>
+          <li>游戏开发</li>
+        </ul>
+      </li>
+      <li>
+        设计创作
+        <ul>
+          <li>平面设计</li>
+          <li>UI设计</li>
+          <li>软件设计</li>
+        </ul>
+      </li>
+      <li>升学考研</li>
+      <li>职企考证</li> -->
+    <!-- </ul> -->
+  </body>
+</html>
+<script>
+  var data = [
+    {
+      name: 'IT互联网',
+      child: [
+        {
+          name: '编辑语言',
+          child: [
+            { name: 'java' },
+            { name: 'c#/.net' },
+            { name: 'python' },
+            {
+              name: '前端开发'
+            }
+          ]
+        },
+        {
+          name: '移动开发'
+        },
+        {
+          name: '游戏开发'
+        }
+      ]
+    },
+    {
+      name: '设计创作',
+      child: [
+        {
+          name: '平面设计'
+        },
+        {
+          name: 'UI设计'
+        },
+        {
+          name: '软件设计'
+        }
+      ]
+    },
+    {
+      name: '升学考研'
+    },
+    {
+      name: '职企考证'
+    }
+  ]
+  // 递归
+  function createTree(data) {
+    var str = `<ul>`
+    for (var i = 0; i < data.length; i++) {
+      str += `<li>${data[i].name}`
+      if (data[i].child) {
+        str += createTree(data[i].child)
+        str += '</li>'
+      }
+    }
+    str += `</ul>`
+    return str
+  }
+
+  document.querySelector('body').innerHTML = createTree(data)
+
+  // 递归组件 组件自身调用自身
+
+  console.log(createTree(data))
+
+  // function createTree(tree) {
+  //   for (var i = 0; i < tree.length; i++) {
+  //     if (tree[i].child && tree[i].child.length > 0) {
+  //       const oul = document.createElement('ul')
+  //       // console.log('11', createTree(tree[i].child))
+  //       // str += createTree(tree[i].child)
+  //       // oul.innerHTML = str
+  //       // s = oul
+  //     }
+  //   }
+  //   console.log(str)
+  //   return str
+  // }
+  // document.querySelector('ul').innerHTML = createTree(data)
+
+  // function createTree(tree) {
+  //   str += `<ul>`
+  //   for (var i = 0; i < tree.length; i++) {
+  //     str += `<li>${tree[i].name}</li>`
+
+  //     if (tree[i].child && tree[i].child.length > 0) {
+  //       str += createTree(tree[i].child)
+  //     }
+  //   }
+  //   str += `</ul>`
+
+  // }
+  // createTree(data)
+  // console.log(str)
+  // document.querySelector('body').innerHTML = str
+
+  const u = document.querySelector('ul')
+  for (var i = 0; i < data.length; i++) {
+    var oli = document.createElement('li')
+    oli.innerHTML = data[i].name
+    u.appendChild(oli)
+
+    if (data[i].child && data[i].child.length > 0) {
+      const oul = document.createElement('ul')
+
+      for (var j = 0; j < data[i].child.length; j++) {
+        var oli1 = document.createElement('li')
+        oli1.innerHTML = data[i].child[j].name
+        oul.appendChild(oli1)
+
+        if (data[i].child[j].child && data[i].child[j].child.length > 0) {
+          const oul2 = document.createElement('ul')
+
+          for (var n = 0; n < data[i].child[j].child.length; n++) {
+            var oli2 = document.createElement('li')
+
+            oli2.innerHTML = data[i].child[j].child[n].name
+
+            oul2.appendChild(oli2)
+          }
+
+          oli1.appendChild(oul2)
+        }
+      }
+
+      oli.appendChild(oul)
+    }
+  }
+</script>
