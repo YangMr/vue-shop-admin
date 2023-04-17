@@ -30,4 +30,7 @@ import LTagsList from './components/LTagsList.vue'
 .el-aside {
   transition: all 0.2s;
 }
+.el-main {
+  padding: 0;
+}
 </style>
