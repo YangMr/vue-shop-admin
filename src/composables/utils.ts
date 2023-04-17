@@ -1,10 +1,13 @@
 import { ElNotification } from 'element-plus'
 import nprogress from 'nprogress'
-
-export const toast = (message: string) => {
+type messageType = 'success' | 'warning' | 'info' | 'error' | ''
+export const toast = (
+  message: string | undefined,
+  type: messageType = 'success'
+) => {
   ElNotification({
     message,
-    type: 'success',
+    type,
     duration: 3000
   })
 }

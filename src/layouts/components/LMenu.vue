@@ -1,4 +1,3 @@
-import component from '../../shims-vue';
 <template>
   <div class="l__menu" :style="{ width: $store.state.asideWidth }">
     <!--  :default-active="$route.path"-->
