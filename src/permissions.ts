@@ -4,8 +4,6 @@ import store from './store'
 import { showFullLoading, hideFullLoading } from './composables/utils'
 
 router.beforeEach(async (to, from, next) => {
-  console.log('to=>', to)
-
   // 开启进度条
   showFullLoading()
 
@@ -28,7 +26,6 @@ router.beforeEach(async (to, from, next) => {
     const user = await store.dispatch('handleUserInfo')
     if (!user) return
 
-    console.log('user=>', user)
     hasNewRoutes = addAsyncRoutes(user.menus)
   }
 

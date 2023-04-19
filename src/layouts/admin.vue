@@ -31,6 +31,6 @@ import LTagsList from './components/LTagsList.vue'
   transition: all 0.2s;
 }
 .el-main {
-  padding: 0;
+  // padding: 0;
 }
 </style>

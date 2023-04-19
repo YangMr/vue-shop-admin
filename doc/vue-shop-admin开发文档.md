@@ -158,8 +158,6 @@ ESLint是一个开源的JavaScript代码检查工具，它可以帮助开发者�
        "plugin:vue/vue3-essential",
        "eslint:recommended",
        "@vue/typescript/recommended",
-       "@vue/prettier",
-       "@vue/prettier/@typescript-eslint",
        'plugin:prettier/recommended'
      ],
    ```

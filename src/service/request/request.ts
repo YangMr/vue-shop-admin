@@ -51,7 +51,6 @@ class YLHttpRequest {
     // 公共的响应拦截器
     this.instance.interceptors.response.use(
       (res) => {
-        console.log('res=>', res.data.data)
         // loadingInstance.close()
         return res.data.data
       },

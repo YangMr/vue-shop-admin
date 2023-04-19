@@ -122,6 +122,7 @@ const handleRefresh = () => {
 .l__header {
   @apply flex items-center bg-indigo-700 fixed left-0 right-0;
   height: 64px;
+  z-index: 999;
 }
 .l__logo {
   @apply flex justify-center items-center text-light-50 font-thin text-xl;
