@@ -40,6 +40,7 @@ declare module '@vue/runtime-core' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     FormDrawer: typeof import('./src/components/FormDrawer.vue')['default']
+    IndexCard: typeof import('./src/components/IndexCard.vue')['default']
     IndexChart: typeof import('./src/components/IndexChart.vue')['default']
     IndexNav: typeof import('./src/components/IndexNav.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

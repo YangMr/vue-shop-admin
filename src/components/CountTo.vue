@@ -5,6 +5,7 @@
 <script setup lang="ts">
 import gsap from 'gsap'
 import { reactive, watch } from 'vue'
+// eslint-disable-next-line no-undef
 const props = defineProps({
   count: {
     type: [Number, String],

@@ -143,6 +143,7 @@ const handleTabChange = (activeName) => {
   height: 44px;
   z-index: 999;
   top: 64px;
+  background-color: rgba(243, 244, 246, 1);
 }
 .tag__btn {
   @apply ml-auto px-2 bg-white flex items-center justify-center rounded;

@@ -7,7 +7,8 @@ const store = createStore({
     token: getToken() || '',
     user: '',
     asideWidth: '250px',
-    menus: []
+    menus: [],
+    ruleName: []
   },
   mutations: {
     setToken(state, token) {
@@ -24,6 +25,9 @@ const store = createStore({
     },
     setMenus(state, menus) {
       state.menus = menus
+    },
+    setRuleName(state, ruleName) {
+      state.ruleName = ruleName
     }
   },
   getters: {
@@ -42,6 +46,7 @@ const store = createStore({
       const res: any = await getUserInfo()
       commit('setUser', res)
       commit('setMenus', res.menus)
+      commit('setRuleName', res.ruleNames)
       return res
     },
     async handleLogout({ commit }) {

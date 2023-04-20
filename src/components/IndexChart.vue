@@ -43,8 +43,10 @@ const handleCheckTag = (item) => {
 var myChart = null
 onMounted(() => {
   var chartDom = document.getElementById('chart')
-  myChart = echarts.init(chartDom)
-  getData(chartDom, myChart)
+  if (chartDom) {
+    myChart = echarts.init(chartDom)
+    getData(chartDom, myChart)
+  }
 })
 
 onBeforeUnmount(() => {

@@ -13,7 +13,8 @@ import 'windi.css'
 import 'nprogress/nprogress.css'
 
 import './style/index.scss'
-
+import permission from './directive/permission'
+app.use(permission)
 app.use(router)
 app.use(store)
 
