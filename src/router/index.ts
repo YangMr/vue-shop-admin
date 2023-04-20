@@ -125,6 +125,13 @@ const asyncRoutes = [
     meta: {
       title: '评论管理'
     }
+  },
+  {
+    path: '/notice/list',
+    component: () => import('@/views//notice/list.vue'),
+    meta: {
+      title: '公告管理'
+    }
   }
 ]
 

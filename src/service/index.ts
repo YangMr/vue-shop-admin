@@ -61,7 +61,7 @@ import YLHttpRequest from './request/request'
 
 const YlRequest = new YLHttpRequest({
   baseURL: '/api',
-  timeout: 1000
+  timeout: 10000
 })
 
 export { YlRequest }
