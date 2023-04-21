@@ -8,7 +8,7 @@
         <LMenu></LMenu>
       </el-aside>
       <el-main>
-        <div style="height: 64px"></div>
+        <!-- <div style="height: 64px"></div> -->
         <!-- 标签导航栏 -->
         <LTagsList></LTagsList>
         <!-- 展示菜单模块对应的内容 -->
@@ -27,9 +27,9 @@ import LTagsList from './components/LTagsList.vue'
 <style lang="scss">
 .el-header {
   padding: 0;
-  position: fixed;
-  height: 64px;
-  z-index: 1000;
+  // position: fixed;
+  // height: 64px;
+  // z-index: 1000;
 }
 .el-aside {
   transition: all 0.2s;

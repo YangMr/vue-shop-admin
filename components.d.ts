@@ -9,6 +9,7 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    AsideList: typeof import('./src/components/AsideList.vue')['default']
     BaseTable: typeof import('./src/components/BaseTable.vue')['default']
     CountTo: typeof import('./src/components/CountTo.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
@@ -45,6 +46,8 @@ declare module '@vue/runtime-core' {
     ElTag: typeof import('element-plus/es')['ElTag']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     FormDrawer: typeof import('./src/components/FormDrawer.vue')['default']
+    ImageAside: typeof import('./src/components/ImageAside.vue')['default']
+    ImageMain: typeof import('./src/components/ImageMain.vue')['default']
     IndexCard: typeof import('./src/components/IndexCard.vue')['default']
     IndexChart: typeof import('./src/components/IndexChart.vue')['default']
     IndexNav: typeof import('./src/components/IndexNav.vue')['default']

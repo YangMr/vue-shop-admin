@@ -121,14 +121,21 @@ const asyncRoutes = [
   },
   {
     path: '/comment/list',
-    component: () => import('@/views//comment/list.vue'),
+    component: () => import('@/views/comment/list.vue'),
     meta: {
       title: '评论管理'
     }
   },
   {
+    path: '/image/list',
+    component: () => import('@/views/image/list.vue'),
+    meta: {
+      title: '图库管理'
+    }
+  },
+  {
     path: '/notice/list',
-    component: () => import('@/views//notice/list.vue'),
+    component: () => import('@/views/notice/list.vue'),
     meta: {
       title: '公告管理'
     }
