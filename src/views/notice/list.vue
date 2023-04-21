@@ -102,7 +102,7 @@ const formDrawerRef = ref()
 const handleOpenDrawer = (row) => {
   typeof row.id === 'number' ? (editId.value = row.id) : (editId.value = 0)
   formDrawerRef.value.open()
-  console.log('row=>', row)
+
   if (row) {
     for (var key in ruleForm) {
       ruleForm[key] = row[key]
