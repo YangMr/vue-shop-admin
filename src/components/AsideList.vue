@@ -12,17 +12,21 @@
         <Edit />
       </el-icon>
     </el-button>
-    <el-button
-      class="px-1"
-      text
-      size="small"
-      type="primary"
-      @click="$emit('close')"
+    <el-popconfirm
+      width="160"
+      confirm-button-text="确定"
+      cancel-button-text="取消"
+      title="是否要删除该分类？"
+      @confirm="$emit('close')"
     >
-      <el-icon :size="12">
-        <Close />
-      </el-icon>
-    </el-button>
+      <template #reference>
+        <el-button class="px-1" text size="small" type="primary">
+          <el-icon :size="12">
+            <Close />
+          </el-icon>
+        </el-button>
+      </template>
+    </el-popconfirm>
   </div>
 </template>
 
